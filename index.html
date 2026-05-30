@@ -1,0 +1,1241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Engineering Interview Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f0f4fb; --surface:#fff; --card:#fff; --card2:#f6f9ff;
+  --border:#dde5f5; --border2:#c4d3ee;
+  --blue:#2563eb; --blue-lt:#dbeafe; --blue-dk:#1e3a8a;
+  --orange:#ea580c; --orange-lt:#ffedd5;
+  --green:#059669; --green-lt:#d1fae5;
+  --purple:#7c3aed; --purple-lt:#ede9fe;
+  --yellow:#b45309; --yellow-lt:#fef3c7;
+  --tx:#1e293b; --tx-h:#0f172a; --tx-md:#334155; --tx-muted:#64748b; --tx-xmuted:#94a3b8;
+  --shadow:0 1px 4px rgba(0,0,0,.07),0 4px 16px rgba(0,0,0,.05);
+  --shadow-md:0 4px 20px rgba(0,0,0,.10);
+  --font-body:'Inter',system-ui,sans-serif;
+  --font-head:'Poppins',sans-serif;
+  --font-mono:'JetBrains Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;}
+body{font-family:var(--font-body);font-size:.95rem;background:var(--bg);color:var(--tx);display:flex;flex-direction:column;height:100%;overflow:hidden;-webkit-font-smoothing:antialiased;}
+
+/* TOPBAR */
+.topbar{display:flex;align-items:center;gap:12px;background:#fff;border-bottom:3px solid var(--blue);padding:10px 18px;min-height:76px;flex-shrink:0;z-index:200;box-shadow:0 2px 12px rgba(37,99,235,.10);}
+.hamburger{display:flex;flex-direction:column;justify-content:center;gap:5.5px;width:44px;height:44px;cursor:pointer;padding:8px;border-radius:10px;flex-shrink:0;transition:background .2s;border:1.5px solid transparent;align-self:center;}
+.hamburger:hover{background:var(--blue-lt);border-color:var(--border);}
+.hamburger span{display:block;height:2.5px;background:var(--blue);border-radius:3px;transition:all .3s;transform-origin:center;}
+.hamburger.open span:nth-child(1){transform:translateY(8px) rotate(45deg);}
+.hamburger.open span:nth-child(2){opacity:0;transform:scaleX(0);}
+.hamburger.open span:nth-child(3){transform:translateY(-8px) rotate(-45deg);}
+.topbar-title{flex:1;line-height:1.35;}
+.topbar-title .line1{display:block;font-family:var(--font-head);font-size:1.10rem;font-weight:800;color:var(--blue-dk);letter-spacing:.2px;}
+.topbar-title .line2{display:block;font-size:.78rem;color:var(--tx-muted);font-weight:500;margin-top:2px;}
+.current-topic-pill{display:inline-block;background:var(--blue-lt);border:1.5px solid #bfdbfe;color:var(--blue-dk);padding:4px 12px;border-radius:20px;font-size:.70rem;font-family:var(--font-mono);font-weight:600;white-space:nowrap;max-width:160px;overflow:hidden;text-overflow:ellipsis;margin-top:5px;}
+
+/* LAYOUT */
+.body-wrapper{display:flex;flex:1;overflow:hidden;position:relative;}
+.overlay{display:none;position:fixed;inset:0;top:76px;background:rgba(15,23,42,.45);backdrop-filter:blur(3px);z-index:150;}
+.overlay.visible{display:block;}
+
+/* SIDEBAR */
+.sidebar{position:fixed;top:76px;left:0;bottom:0;width:288px;background:#fff;border-right:2px solid var(--border);z-index:160;display:flex;flex-direction:column;transform:translateX(-100%);transition:transform .32s cubic-bezier(.4,0,.2,1);box-shadow:4px 0 30px rgba(0,0,0,.12);}
+.sidebar.open{transform:translateX(0);}
+.sidebar-header{padding:16px;border-bottom:1px solid var(--border);flex-shrink:0;background:#f8faff;}
+.sidebar-header-title{font-family:var(--font-head);font-size:.75rem;font-weight:700;color:var(--orange);letter-spacing:2.5px;text-transform:uppercase;margin-bottom:10px;}
+.sidebar-search input{width:100%;background:#fff;border:1.5px solid var(--border);color:var(--tx);padding:9px 13px;border-radius:9px;font-family:var(--font-body);font-size:.85rem;outline:none;transition:border-color .2s;}
+.sidebar-search input::placeholder{color:var(--tx-xmuted);}
+.sidebar-search input:focus{border-color:var(--blue);}
+.nav-list{flex:1;overflow-y:auto;padding:6px 0 24px;}
+.nav-list::-webkit-scrollbar{width:4px;}
+.nav-list::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+.nav-item{display:flex;align-items:center;gap:11px;padding:11px 16px;cursor:pointer;border-left:3px solid transparent;transition:all .18s;user-select:none;}
+.nav-item:hover{background:#f0f6ff;border-left-color:var(--border2);}
+.nav-item.active{background:var(--blue-lt);border-left-color:var(--blue);}
+.nav-num{font-family:var(--font-mono);font-size:.68rem;font-weight:500;background:#f1f5fb;color:var(--blue);border:1px solid var(--border);padding:2px 7px;border-radius:5px;min-width:32px;text-align:center;flex-shrink:0;}
+.nav-item.active .nav-num{background:var(--blue);color:#fff;border-color:var(--blue);}
+.nav-label{font-size:.88rem;font-weight:500;color:var(--tx-muted);}
+.nav-item.active .nav-label{color:var(--blue-dk);font-weight:700;}
+.nav-item:hover .nav-label{color:var(--tx);}
+
+/* MAIN */
+.main{flex:1;overflow-y:auto;padding:24px 20px 56px;height:100%;}
+.main::-webkit-scrollbar{width:6px;}
+.main::-webkit-scrollbar-track{background:var(--bg);}
+.main::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+.topic-section{display:none;}
+.topic-section.active{display:block;animation:fadeIn .28s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+/* TOPIC HEADER */
+.topic-header{margin-bottom:20px;}
+.topic-tag{font-family:var(--font-mono);font-size:.68rem;font-weight:500;color:var(--orange);text-transform:uppercase;letter-spacing:3px;margin-bottom:6px;}
+.topic-title{font-family:var(--font-head);font-size:1.85rem;font-weight:800;color:var(--tx-h);line-height:1.15;letter-spacing:-.4px;}
+.progress-bar{height:4px;background:linear-gradient(90deg,var(--blue),var(--purple),var(--orange));border-radius:4px;margin-top:10px;}
+
+/* OVERVIEW CARD */
+.overview-card{background:linear-gradient(135deg,#eef4ff 0%,#f5f0ff 100%);border:1.5px solid #c7d9ff;border-radius:14px;padding:20px 22px;margin:16px 0 20px;position:relative;overflow:hidden;}
+.overview-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--blue),var(--purple));}
+.overview-badge{display:inline-flex;align-items:center;gap:6px;background:var(--blue);color:#fff;font-family:var(--font-head);font-size:.68rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:4px 12px;border-radius:20px;margin-bottom:12px;}
+.overview-title{font-family:var(--font-head);font-size:1.10rem;font-weight:700;color:var(--tx-h);margin-bottom:8px;}
+.overview-text{font-size:.92rem;line-height:1.80;color:var(--tx-md);}
+.overview-text strong{color:var(--blue-dk);font-weight:700;}
+.overview-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;}
+.overview-grid-item{background:#fff;border:1px solid var(--border);border-radius:10px;padding:11px 14px;}
+.ogi-label{font-family:var(--font-mono);font-size:.63rem;font-weight:600;color:var(--tx-muted);text-transform:uppercase;letter-spacing:2px;margin-bottom:3px;}
+.ogi-val{font-size:.87rem;font-weight:600;color:var(--tx-h);}
+@media(max-width:520px){.overview-grid{grid-template-columns:1fr;}}
+
+/* SUBTOPIC */
+.subtopic{background:var(--card);border:1.5px solid var(--border);border-radius:14px;margin:18px 0;overflow:hidden;box-shadow:var(--shadow);}
+.subtopic-header{display:flex;align-items:center;gap:12px;padding:15px 18px;background:var(--card2);border-bottom:1.5px solid var(--border);}
+.subtopic-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.15rem;flex-shrink:0;}
+.subtopic-icon.blue{background:var(--blue-lt);}
+.subtopic-icon.orange{background:var(--orange-lt);}
+.subtopic-icon.green{background:var(--green-lt);}
+.subtopic-icon.purple{background:var(--purple-lt);}
+.subtopic-title{font-family:var(--font-head);font-size:1.02rem;font-weight:700;color:var(--tx-h);}
+.subtopic-sub{font-size:.77rem;color:var(--tx-muted);margin-top:2px;}
+.subtopic-body{padding:18px 20px;}
+.subtopic-body p{font-size:.92rem;line-height:1.80;color:var(--tx-md);margin-bottom:10px;}
+.subtopic-body p strong{color:var(--blue-dk);}
+.subtopic-body p:last-child{margin-bottom:0;}
+
+/* SECTION HEADING */
+.sec-heading{font-family:var(--font-head);font-size:.78rem;font-weight:700;color:var(--blue-dk);text-transform:uppercase;letter-spacing:2px;margin:16px 0 8px;padding-bottom:5px;border-bottom:1.5px solid var(--blue-lt);}
+
+/* DETAIL LIST */
+.detail-list{padding-left:0;list-style:none;margin:8px 0;}
+.detail-list li{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:.90rem;line-height:1.65;color:var(--tx-md);}
+.detail-list li:last-child{border-bottom:none;}
+.detail-list li::before{content:"\25B8";color:var(--blue);font-size:.85rem;margin-top:2px;flex-shrink:0;}
+.detail-list li strong{color:var(--tx-h);}
+
+/* Q&A */
+.qa-section-title{font-family:var(--font-head);font-size:.88rem;font-weight:700;color:var(--tx-muted);text-transform:uppercase;letter-spacing:2px;margin:22px 0 10px;display:flex;align-items:center;gap:8px;}
+.qa-section-title::before{content:'';display:block;width:16px;height:3px;background:var(--orange);border-radius:2px;}
+.qa-card{background:var(--card);border:1.5px solid var(--border);border-radius:12px;margin-bottom:10px;overflow:hidden;transition:border-color .2s,box-shadow .2s;box-shadow:var(--shadow);}
+.qa-card:hover{border-color:var(--blue);box-shadow:var(--shadow-md);}
+.qa-card.open{border-color:var(--blue);box-shadow:0 4px 20px rgba(37,99,235,.10);}
+.qa-question{padding:14px 18px;cursor:pointer;display:flex;align-items:flex-start;gap:12px;user-select:none;-webkit-tap-highlight-color:transparent;}
+.q-num{font-family:var(--font-mono);font-size:.68rem;font-weight:600;color:var(--blue);background:var(--blue-lt);border:1px solid #bfdbfe;padding:3px 8px;border-radius:6px;min-width:36px;text-align:center;flex-shrink:0;margin-top:2px;}
+.q-text{font-weight:600;font-size:.95rem;color:var(--tx-h);line-height:1.50;flex:1;}
+.q-toggle{font-size:1.5rem;color:var(--blue);flex-shrink:0;transition:transform .3s;font-weight:300;margin-top:1px;}
+.qa-card.open .q-toggle{transform:rotate(45deg);}
+.qa-answer{display:none;padding:16px 18px;border-top:1.5px solid var(--border);background:#fafbff;}
+.qa-card.open .qa-answer{display:block;}
+.ans-text{font-size:.92rem;line-height:1.82;color:var(--tx-md);}
+.ans-text strong{color:var(--blue-dk);font-weight:700;}
+.ans-text em{color:var(--orange);font-style:normal;font-weight:600;}
+
+/* KEY POINTS */
+.key-points{background:var(--blue-lt);border-left:4px solid var(--blue);border-radius:0 10px 10px 0;padding:13px 16px;margin-top:13px;}
+.key-points-title{font-family:var(--font-head);font-size:.72rem;font-weight:700;color:var(--blue-dk);text-transform:uppercase;letter-spacing:2.5px;margin-bottom:9px;}
+.key-points ul{padding-left:17px;}
+.key-points li{font-size:.90rem;line-height:1.72;margin-bottom:4px;color:var(--tx-md);}
+.key-points li::marker{color:var(--blue);}
+.key-points li strong{color:var(--blue-dk);}
+
+/* TABLES */
+.info-table{width:100%;border-collapse:collapse;margin-top:12px;font-size:.85rem;display:block;overflow-x:auto;}
+.info-table th{background:var(--blue-lt);color:var(--blue-dk);padding:9px 12px;text-align:left;font-family:var(--font-head);font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;border:1.5px solid #bfdbfe;white-space:nowrap;}
+.info-table td{padding:9px 12px;border:1px solid var(--border);color:var(--tx-md);vertical-align:top;line-height:1.55;}
+.info-table td strong{color:var(--blue-dk);}
+.info-table tr:nth-child(even) td{background:#f8faff;}
+
+/* ALERTS */
+.alert{border-radius:10px;padding:12px 15px;margin-top:12px;font-size:.89rem;line-height:1.68;display:flex;gap:10px;align-items:flex-start;}
+.alert.tip{background:var(--green-lt);border:1.5px solid #6ee7b7;color:#065f46;}
+.alert.warning{background:var(--orange-lt);border:1.5px solid #fdba74;color:#9a3412;}
+.alert.info{background:var(--blue-lt);border:1.5px solid #93c5fd;color:#1e40af;}
+.alert-icon{font-size:1rem;flex-shrink:0;margin-top:1px;}
+
+/* FORMULA */
+.formula{background:#eff4ff;border:1.5px solid #bfdbfe;border-radius:10px;padding:14px 18px;margin:12px 0;font-family:var(--font-mono);font-size:.86rem;font-weight:500;color:var(--blue-dk);text-align:center;white-space:pre-wrap;word-break:break-word;line-height:1.75;}
+
+/* TAGS */
+.tags{display:flex;flex-wrap:wrap;gap:7px;margin-top:18px;padding-top:14px;border-top:1.5px solid var(--border);}
+.tag{background:var(--blue-lt);border:1px solid #bfdbfe;color:var(--blue-dk);padding:4px 11px;border-radius:20px;font-size:.70rem;font-family:var(--font-mono);font-weight:600;}
+.tag.orange{color:#9a3412;border-color:#fdba74;background:var(--orange-lt);}
+.tag.green{color:#065f46;border-color:#6ee7b7;background:var(--green-lt);}
+.tag.purple{color:#5b21b6;border-color:#c4b5fd;background:var(--purple-lt);}
+svg text{font-family:var(--font-mono);}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="hamburger" id="hamburger" onclick="toggleSidebar()">
+    <span></span><span></span><span></span>
+  </div>
+  <div class="topbar-title">
+    <span class="line1">&#9881; Engineering Interview Guide</span>
+    <span class="line2">17 Topics &middot; GD&amp;T &middot; Sheet Metal &middot; Casting &middot; Plastics &middot; FEA &middot; DFM &amp; More</span>
+    <span class="current-topic-pill" id="currentPill">GD&amp;T</span>
+  </div>
+</div>
+<div class="body-wrapper">
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-header-title">&#128218; Select Topic</div>
+    <div class="sidebar-search"><input type="text" id="searchInput" placeholder="&#128269; Search topics..." oninput="filterNav(this.value)"></div>
+  </div>
+  <div class="nav-list" id="navList">
+    <div class="nav-item active" onclick="showTopic('t1','GD&amp;T')" data-name="gdt geometric dimensioning tolerancing"><span class="nav-num">01</span><span class="nav-label">GD&amp;T</span></div>
+    <div class="nav-item" onclick="showTopic('t2','Sheet Metal Design')" data-name="sheet metal design bend k-factor springback"><span class="nav-num">02</span><span class="nav-label">Sheet Metal Design</span></div>
+    <div class="nav-item" onclick="showTopic('t3','Sheet Metal Mfg.')" data-name="sheet metal manufacturing blanking piercing deep drawing progressive die"><span class="nav-num">03</span><span class="nav-label">Sheet Metal Mfg.</span></div>
+    <div class="nav-item" onclick="showTopic('t4','Casting Design')" data-name="casting design draft angle parting line undercut wall thickness"><span class="nav-num">04</span><span class="nav-label">Casting Design</span></div>
+    <div class="nav-item" onclick="showTopic('t5','Casting Mfg.')" data-name="casting manufacturing sand die investment centrifugal defects porosity"><span class="nav-num">05</span><span class="nav-label">Casting Mfg.</span></div>
+    <div class="nav-item" onclick="showTopic('t6','Plastic Design')" data-name="plastic design boss rib snap fit living hinge wall thickness draft"><span class="nav-num">06</span><span class="nav-label">Plastic Design</span></div>
+    <div class="nav-item" onclick="showTopic('t7','Injection Moulding')" data-name="injection moulding cycle gate runner clamping force pack hold"><span class="nav-num">07</span><span class="nav-label">Injection Moulding</span></div>
+    <div class="nav-item" onclick="showTopic('t8','Moulding Defects')" data-name="moulding defects sink warpage flash short shot weld line burn jetting"><span class="nav-num">08</span><span class="nav-label">Moulding Defects</span></div>
+    <div class="nav-item" onclick="showTopic('t9','Tolerance Stackup')" data-name="tolerance stackup worst case rss statistical analysis"><span class="nav-num">09</span><span class="nav-label">Tolerance Stackup</span></div>
+    <div class="nav-item" onclick="showTopic('t10','Projects')" data-name="projects design engineering star method presentation"><span class="nav-num">10</span><span class="nav-label">Projects</span></div>
+    <div class="nav-item" onclick="showTopic('t11','Basic Materials')" data-name="basic materials steel aluminium plastic ashby selection"><span class="nav-num">11</span><span class="nav-label">Basic Materials</span></div>
+    <div class="nav-item" onclick="showTopic('t12','Finishing Processes')" data-name="finishing anodizing powder coating electroplating surface roughness ra rz"><span class="nav-num">12</span><span class="nav-label">Finishing Processes</span></div>
+    <div class="nav-item" onclick="showTopic('t13','DFMEA')" data-name="dfmea failure mode effects analysis rpn severity occurrence detection"><span class="nav-num">13</span><span class="nav-label">DFMEA</span></div>
+    <div class="nav-item" onclick="showTopic('t14','ECO &amp; ECR')" data-name="eco ecr engineering change order request effectivity disposition"><span class="nav-num">14</span><span class="nav-label">ECO &amp; ECR</span></div>
+    <div class="nav-item" onclick="showTopic('t15','DFM / DFA / DFX')" data-name="dfm dfa dfx design manufacturing assembly reliability environment"><span class="nav-num">15</span><span class="nav-label">DFM / DFA / DFX</span></div>
+    <div class="nav-item" onclick="showTopic('t16','Additive Mfg.')" data-name="additive manufacturing 3d printing fdm sla sls dmls dfam topology"><span class="nav-num">16</span><span class="nav-label">Additive Mfg.</span></div>
+    <div class="nav-item" onclick="showTopic('t17','FEA Basics')" data-name="fea finite element analysis von mises meshing convergence fos modal"><span class="nav-num">17</span><span class="nav-label">FEA Basics</span></div>
+  </div>
+</div>
+<div class="main" id="mainContent">
+
+<!-- T1: GD&T -->
+<div id="t1" class="topic-section active">
+<div class="topic-header">
+  <div class="topic-tag">Topic 01 · Dimensioning &amp; Tolerancing</div>
+  <div class="topic-title">GD&amp;T — Geometric Dimensioning &amp; Tolerancing</div>
+  <div class="progress-bar"></div>
+</div>
+<div class="overview-card">
+  <div class="overview-badge">📐 Overview</div>
+  <div class="overview-title">What is GD&amp;T?</div>
+  <div class="overview-text"><strong>GD&amp;T</strong> is a standardised symbolic language on engineering drawings that precisely communicates allowable variation in form, size, orientation, and location of part features. Governed by <strong>ASME Y14.5</strong> (USA) and <strong>ISO 1101</strong> (International). Unlike ± coordinate tolerancing which creates a square zone, GD&amp;T uses geometric zones that reflect functional intent — providing up to <strong>57% more usable tolerance area</strong> for position vs a square ± zone. It eliminates measurement ambiguity by defining exact datum references.</div>
+  <div class="overview-grid">
+    <div class="overview-grid-item"><div class="ogi-label">US Standard</div><div class="ogi-val">ASME Y14.5-2018</div></div>
+    <div class="overview-grid-item"><div class="ogi-label">ISO Standard</div><div class="ogi-val">ISO 1101:2017</div></div>
+    <div class="overview-grid-item"><div class="ogi-label">Total Symbols</div><div class="ogi-val">14 in 5 categories</div></div>
+    <div class="overview-grid-item"><div class="ogi-label">Key Benefit</div><div class="ogi-val">Function-based tolerancing</div></div>
+  </div>
+</div>
+<div class="subtopic">
+  <div class="subtopic-header"><div class="subtopic-icon blue">📏</div><div><div class="subtopic-title">The 5 GD&amp;T Control Categories</div><div class="subtopic-sub">Form · Profile · Orientation · Location · Runout</div></div></div>
+  <div class="subtopic-body">
+    <p><strong>Form controls</strong> — Straightness (⎯), Flatness (⏥), Circularity (○), Cylindricity — define the shape of a single feature independently with no datum needed. Flatness controls all surface points within two parallel planes. Circularity controls each circular cross-section roundness. Cylindricity simultaneously controls circularity, straightness, and taper of a full cylinder.</p>
+    <p><strong>Orientation controls</strong> — Parallelism (∥), Perpendicularity (⊥), Angularity (∠) — relate a feature's angle to a datum. All three require at least one datum reference. Parallelism keeps a surface/axis parallel to a datum; Perpendicularity holds 90°; Angularity holds any specified angle.</p>
+    <p><strong>Location controls</strong> — True Position (⊕), Concentricity (◎), Symmetry (=) — define where a feature is in space relative to datums. True Position is the most important, defining a cylindrical tolerance zone around the theoretically exact location.</p>
+    <p><strong>Runout controls</strong> — Circular Runout (↗) and Total Runout (⇗) — measure surface variation relative to a datum axis during rotation. Circular Runout checks each cross-section independently; Total Runout controls the entire surface simultaneously and is the most stringent GD&amp;T control.</p>
+    <p><strong>Profile controls</strong> — Profile of a Line (⌒) and Profile of a Surface (⌓) — define allowable boundaries of complex curved shapes. Can reference a datum or work independently; ideal for aerodynamic or ergonomic surfaces.</p>
+  </div>
+</div>
+<div class="subtopic">
+  <div class="subtopic-header"><div class="subtopic-icon orange">🖊</div><div><div class="subtopic-title">Feature Control Frame &amp; Material Modifiers</div><div class="subtopic-sub">Reading GD&amp;T callouts · MMC · LMC · RFS</div></div></div>
+  <div class="subtopic-body">
+    <p>The <strong>Feature Control Frame (FCF)</strong> is read left to right: [Geometric symbol] | [⌀ if cylindrical zone] [Tolerance value] [Modifier] | [Datum A] | [Datum B] | [Datum C]. Example: <strong>⊕ | ⌀0.5 Ⓜ | A | B | C</strong> = "Position within ⌀0.5 at MMC, relative to datums A, B, C."</p>
+    <div class="sec-heading">Material Condition Modifiers</div>
+    <ul class="detail-list">
+      <li><strong>Ⓜ MMC — Maximum Material Condition:</strong> Smallest hole / largest shaft. Enables bonus tolerance as feature departs from worst-case size. Used for assembly clearance/fit.</li>
+      <li><strong>Ⓛ LMC — Least Material Condition:</strong> Largest hole / smallest shaft. Used when wall thickness or edge distance is the critical concern.</li>
+      <li><strong>Ⓢ RFS — Regardless of Feature Size:</strong> Tolerance applies equally regardless of actual size — default if no modifier shown. Used for balance and runout.</li>
+    </ul>
+    <div class="alert info"><span class="alert-icon">💡</span> Bonus tolerance at MMC: If Ø10 hole has position tol 0.2 at MMC, and actual hole = Ø10.4, bonus = 0.4 → total tol = 0.6 mm.</div>
+  </div>
+</div>
+<div class="subtopic">
+  <div class="subtopic-header"><div class="subtopic-icon green">📍</div><div><div class="subtopic-title">Datums &amp; the 3-2-1 Locating Principle</div><div class="subtopic-sub">Establishing exact measurement reference frames</div></div></div>
+  <div class="subtopic-body">
+    <p>A <strong>datum</strong> is a theoretically exact geometric reference (plane, axis, or point) from which measurements are made. Real datums are simulated by datum simulators — surface plate, precision mandrel, or chuck.</p>
+    <ul class="detail-list">
+      <li><strong>Primary datum (3 contact points):</strong> Largest functional surface. Removes 3 DOF: z-translation, x-rotation, y-rotation.</li>
+      <li><strong>Secondary datum (2 contact points):</strong> Second surface. Removes 2 DOF: x-translation, z-rotation.</li>
+      <li><strong>Tertiary datum (1 contact point):</strong> Removes final DOF: y-translation. Part is now fully constrained.</li>
+      <li><strong>Selection rule:</strong> Always choose datums based on functional mating interfaces — not manufacturing convenience.</li>
+    </ul>
+  </div>
+</div>
+<div class="qa-section-title">Interview Questions</div>
+<div class="qa-card" onclick="toggleQA(this)"><div class="qa-question"><span class="q-num">Q1</span><span class="q-text">What is True Position and how do you calculate the actual deviation?</span><span class="q-toggle">+</span></div><div class="qa-answer"><div class="ans-text">True Position (⊕) defines a cylindrical tolerance zone centred on the theoretically exact feature location. The feature axis must fall within this zone.</div><div class="formula">Actual Deviation = 2 × √[(Δx)² + (Δy)²]</div><div class="ans-text">Example: Nominal X=50, Y=30. Measured X=50.2, Y=29.9. Deviation = 2 × √[0.04+0.01] = <em>0.447 mm</em>. If tolerance = ⌀0.5, feature passes.</div><div class="alert tip"><span class="alert-icon">✅</span> Circular zone gives 57% more area than ±0.25/±0.25 square zone — a key GD&amp;T advantage to always mention.</div></div></div>
+<div class="qa-card" onclick="toggleQA(this)"><div class="qa-question"><span class="q-num">Q2</span><span class="q-text">Flatness vs Straightness vs Parallelism — explain the difference.</span><span class="q-toggle">+</span></div><div class="qa-answer"><table class="info-table"><tr><th>Control</th><th>Controls</th><th>Datum Required?</th></tr><tr><td><strong>Flatness ⏥</strong></td><td>All surface points within two parallel planes</td><td>No — self-contained</td></tr><tr><td><strong>Straightness ⎯</strong></td><td>Line/axis within tolerance zone</td><td>No — self-contained</td></tr><tr><td><strong>Parallelism ∥</strong></td><td>Surface/axis parallel to datum within zone</td><td>Yes — always</td></tr></table><div class="alert info"><span class="alert-icon">💡</span> A parallel surface must also be flat, but a flat surface has no parallelism requirement. Flatness is self-contained; parallelism is relative to a datum.</div></div></div>
+<div class="qa-card" onclick="toggleQA(this)"><div class="qa-question"><span class="q-num">Q3</span><span class="q-text">Circular Runout vs Total Runout — when do you use each?</span><span class="q-toggle">+</span></div><div class="qa-answer"><table class="info-table"><tr><th>Control</th><th>Measures</th><th>How</th><th>Use When</th></tr><tr><td><strong>Circular Runout ↗</strong></td><td>Each cross-section independently</td><td>Dial indicator at one axial point, rotate 360°</td><td>Wobble at specific locations is acceptable</td></tr><tr><td><strong>Total Runout ⇗</strong></td><td>Entire surface simultaneously</td><td>Dial swept full length + rotated</td><td>Full surface control needed (bearing bores, seals)</td></tr></table><div class="alert warning"><span class="alert-icon">⚠️</span> Total Runout is more restrictive and costly. Only specify it when the entire surface interface is functional.</div></div></div>
+<div class="tags"><span class="tag">ASME Y14.5</span><span class="tag orange">MMC / LMC / RFS</span><span class="tag green">3-2-1 Datum Rule</span><span class="tag">True Position</span><span class="tag purple">Feature Control Frame</span></div>
+</div>
+
+<!-- T2: SHEET METAL DESIGN -->
+<div id="t2" class="topic-section">
+<div class="topic-header">
+  <div class="topic-tag">Topic 02 · Design Guidelines</div>
+  <div class="topic-title">Sheet Metal Design</div>
+  <div class="progress-bar"></div>
+</div>
+<div class="overview-card">
+  <div class="overview-badge">🔩 Overview</div>
+  <div class="overview-title">What is Sheet Metal Design?</div>
+  <div class="overview-text">Sheet metal design creates parts from flat metal sheets (0.5–20 mm thick) through cutting, bending, punching, and forming. A key task is developing the accurate <strong>flat pattern</strong> — the blank layout that when bent produces the correct final geometry. Critical parameters include <strong>K-factor, bend allowance, minimum bend radius, hole placement rules, springback, and relief cuts</strong>. Common materials: mild steel, stainless steel, aluminium, copper. CAD tools like SolidWorks and CATIA auto-compute flat patterns using the K-factor.</div>
+  <div class="overview-grid">
+    <div class="overview-grid-item"><div class="ogi-label">Typical Thickness</div><div class="ogi-val">0.5 – 12 mm</div></div>
+    <div class="overview-grid-item"><div class="ogi-label">Key Standard</div><div class="ogi-val">DIN 6935 / ISO 2768</div></div>
+    <div class="overview-grid-item"><div class="ogi-label">Critical Design Output</div><div class="ogi-val">Accurate flat pattern</div></div>
+    <div class="overview-grid-item"><div class="ogi-label">K-Factor Range</div><div class="ogi-val">0.33 – 0.50</div></div>
+  </div>
+</div>
+<div class="subtopic">
+  <div class="subtopic-header"><div class="subtopic-icon blue">📐</div><div><div class="subtopic-title">K-Factor &amp; Bend Allowance</div><div class="subtopic-sub">The mathematics behind accurate flat pattern development</div></div></div>
+  <div class="subtopic-body">
+    <p>When sheet metal is bent, the <strong>neutral axis</strong> is the theoretical line that neither stretches nor compresses. The <strong>K-factor</strong> is the ratio of the neutral axis distance from the inside surface to total thickness. It determines the arc length (Bend Allowance) consumed in the bend zone — directly affecting the correct blank length.</p>
+    <div class="formula">K = t_neutral / t_total
+Bend Allowance (BA) = (π/180) × Angle × (R_inside + K × t)
+Blank Length = L1 + L2 + BA</div>
+    <ul class="detail-list">
+      <li><strong>Soft copper/brass — K ≈ 0.35:</strong> Material compresses significantly on the inner bend surface.</li>
+      <li><strong>Aluminium / mild steel 1018 — K ≈ 0.41:</strong> Most common design assumption for general sheet metal work.</li>
+      <li><strong>Hard steel / stainless 304 — K ≈ 0.45–0.50:</strong> Less neutral axis shift due to material stiffness.</li>
+      <li><strong>Wrong K-factor consequence:</strong> Bent parts come out over- or under-size — critical for precision assembly interfaces.</li>
+    </ul>
+  </div>
+</div>
+<div class="subtopic">
+  <div class="subtopic-header"><div class="subtopic-icon orange">🔄</div><div><div class="subtopic-title">Springback</div><div class="subtopic-sub">Elastic recovery after bending and compensation methods</div></div></div>
+  <div class="subtopic-body">
+    <p><strong>Springback</strong> is the elastic partial unbending that occurs after bending force is removed. The material core retains elastic energy that causes the part to open toward its original shape. Springback increases with higher yield strength and lower elastic modulus (E). High-strength steel (AHSS/HSLA) shows 3–5× more springback than mild steel.</p>
+    <ul class="detail-list">
+      <li><strong>Over-bending:</strong> Bend to a smaller angle than required (e.g., 87° to achieve 90°). Most common method for press brake operations.</li>
+      <li><strong>Bottoming:</strong> Punch contacts die floor — more plastic deformation, minimal springback. Requires 5–8× more press force than air bending.</li>
+      <li><strong>Coining:</strong> Full-thickness plastic deformation at very high force (10–30×). Nearly zero springback but expensive tooling loads.</li>
+      <li><strong>Stretch bending:</strong> Apply tensile stress during bending to shift neutral axis and minimise elastic recovery.</li>
+    </ul>
+  </div>
+</div>
+<div class="subtopic">
+  <div class="subtopic-header"><div class="subtopic-icon green">🕳</div><div><div class="subtopic-title">Hole &amp; Feature Placement Rules</div><div class="subtopic-sub">Preventing tearing, distortion, and punch breakage</div></div></div>
+  <div class="subtopic-body">
+    <table class="info-table"><tr><th>Feature</th><th>Minimum Distance</th><th>Why</th></tr>
+    <tr><td>Min hole diameter</td><td>≥ material thickness t</td><td>Prevent punch breakage</td></tr>
+    <tr><td>Hole to edge</td><td>≥ 1.5t – 2t</td><td>Prevent edge tearing</td></tr>
+    <tr><td>Hole to bend</td><td>≥ 2t + bend radius</td><td>Prevent hole oval distortion</td></tr>
+    <tr><td>Hole to hole</td><td>≥ 2 × hole diameter</td><td>Prevent web distortion</td></tr>
+    <tr><td>Slot width</td><td>≥ 1.2t</td><td>Punch durability</td></tr></table>
+    <p style="margin-top:12px;"><strong>Relief cuts</strong> are notches at bend corners where two bends meet. Without them, material tears or piles up at the corner. Minimum size: width ≥ t, depth extending to bend tangent line.</p>
+    <p>Minimum bend radius depends on material ductility: Soft Al 5052: 0t | Mild steel: 0.5–1t | SS 304: 1–1.5t | Al 6061-T6: 2–3t | HSLA: 3–5t.</p>
+  </div>
+</div>
+<div class="qa-section-title">Interview Questions</div>
+<div class="qa-card" onclick="toggleQA(this)"><div class="qa-question"><span class="q-num">Q1</span><span class="q-text">What is bend deduction and how does it differ from bend allowance?</span><span class="q-toggle">+</span></div><div class="qa-answer"><div class="ans-text"><strong>Bend Allowance (BA)</strong> is the actual arc length of material in the bend. <strong>Bend Deduction (BD)</strong> is the amount subtracted from the sum of both flange lengths to get the correct flat blank length — it accounts for the apparent shortening due to bending.</div><div class="formula">BD = 2 × OSSB − BA
+OSSB = tan(Angle/2) × (R + t)
+Blank Length = Flange1 + Flange2 − BD</div><div class="alert info"><span class="alert-icon">💡</span> Most CAD systems use K-factor internally to compute BA automatically. BD is commonly used in manual press brake work and tooling sheets.</div></div></div>
+<div class="tags"><span class="tag">K-Factor</span><span class="tag orange">Bend Allowance / Deduction</span><span class="tag orange">Springback</span><span class="tag green">Min Bend Radius</span><span class="tag">Relief Cuts</span><span class="tag purple">Flat Pattern</span></div>
+</div>
+
+<!-- T3: SHEET METAL MFG -->
+<div id="t3" class="topic-section">
+<div class="topic-header">
+  <div class="topic-tag">Topic 03 · Manufacturing Processes</div>
+  <div class="topic-title">Sheet Metal Manufacturing</div>
+  <div class="progress-bar"></div>
+</div>
+<div class="overview-card">
+  <div class="overview-badge">🏭 Overview</div>
+  <div class="overview-title">Sheet Metal Manufacturing Processes</div>
+  <div class="overview-text">Sheet metal manufacturing covers four operation families: <strong>Cutting</strong> (shearing, laser, waterjet, plasma), <strong>Forming</strong> (bending, deep drawing, roll forming, hydroforming), <strong>Joining</strong> (welding, riveting, clinching), and <strong>Finishing</strong> (powder coating, anodizing, deburring). Process selection depends on material, volume, tolerance, and geometry complexity. Progressive dies combine multiple operations in one stroke for high-volume parts; press brakes handle low-volume flexible bending.</div>
+  <div class="overview-grid">
+    <div class="overview-grid-item"><div class="ogi-label">Cutting Methods</div><div class="ogi-val">Shear, Laser, Waterjet, Plasma</div></div>
+    <div class="overview-grid-item"><div class="ogi-label">Forming Methods</div><div class="ogi-val">Air Bend, Coining, Deep Draw</div></div>
+    <div class="overview-grid-item"><div class="ogi-label">High-Vol Tool</div><div class="ogi-val">Progressive Die</div></div>
+    <div class="overview-grid-item"><div class="ogi-label">Flexible Tool</div><div class="ogi-val">Press Brake + Turret Punch</div></div>
+  </div>
+</div>
+<div class="subtopic">
+  <div class="subtopic-header"><div class="subtopic-icon blue">✂️</div><div><div class="subtopic-title">Blanking, Piercing &amp; Cutting Processes</div><div class="subtopic-sub">Shearing, Laser, Waterjet, Plasma — differences and selection</div></div></div>
+  <div class="subtopic-body">
+    <p><strong>Blanking</strong> — the punched-out piece is the product (blank); remaining strip is waste. <strong>Piercing</strong> — the strip with holes is the product; punched slug is waste. Die clearance: 5–10% of thickness per side. Too little → burr, punch wear. Too much → rollover, poor edge quality.</p>
+    <p><strong>Laser cutting</strong> uses a focused CO₂ or fibre laser. Excellent accuracy (±0.05–0.1 mm), no tooling cost, complex profiles possible. Fibre lasers faster and more energy-efficient for thin metals.</p>
+    <p><strong>Waterjet cutting</strong> uses high-pressure water (up to 6,000 bar) + abrasive garnet. No heat-affected zone (HAZ) — ideal for heat-sensitive materials, composites, thick plates.</p>
+    <p><strong>Plasma cutting</strong> is faster and cheaper for thick steel (&gt;6 mm) but leaves a large HAZ and lower precision (±0.5–1.5 mm). Only for conductive materials.</p>
+  </div>
+</div>
+<div class="subtopic">
+  <div class="subtopic-header"><div class="subtopic-icon orange">🔨</div><div><div class="subtopic-title">Bending: Air Bending vs Bottoming vs Coining</div><div class="subtopic-sub">Press brake processes — force, accuracy, and springback comparison</div></div></div>
+  <div class="subtopic-body">
+    <table class="info-table"><tr><th>Method</th><th>Punch Penetration</th><th>Force</th><th>Springback</th><th>Accuracy</th><th>Best For</th></tr>
+    <tr><td><strong>Air Bending</strong></td><td>Doesn't reach die floor</td><td>Low (1×)</td><td>High — must over-bend</td><td>±1–2°</td><td>Most common; one tool set, multiple angles</td></tr>
+    <tr><td><strong>Bottoming</strong></td><td>Contacts die walls</td><td>5–8×</td><td>Minimal</td><td>±0.5°</td><td>Better accuracy, angle set by die</td></tr>
+    <tr><td><strong>Coining</strong></td><td>Full thickness plasticity</td><td>10–30×</td><td>Nearly zero</td><td>±0.1°</td><td>Precision parts, connectors</td></tr></table>
+  </div>
+</div>
+<div class="subtopic">
+  <div class="subtopic-header"><div class="subtopic-icon green">🥤</div><div><div class="subtopic-title">Deep Drawing</div><div class="subtopic-sub">Forming cups and enclosures from flat blanks without cutting</div></div></div>
+  <div class="subtopic-body">
+    <p>Deep drawing pulls a flat blank into a die cavity using a punch. Material flows radially inward — no cutting. A blank holder prevents wrinkling in the flange.</p>
+    <div class="formula">Draw Ratio (DR) = Blank Diameter / Punch Diameter
+Limiting Draw Ratio (LDR) ≈ 1.8–2.3 for mild steel</div>
+    <ul class="detail-list">
+      <li><strong>Blank holder force:</strong> Must prevent flange wrinkling but allow material flow. Too high → tearing at punch radius.</li>
+      <li><strong>Ironing:</strong> Deliberate wall thinning by reducing punch-die clearance (used for beverage cans).</li>
+      <li><strong>Redrawing:</strong> For parts deeper than LDR, multiple draw passes with intermediate annealing are needed.</li>
+      <li><strong>Earing:</strong> Non-uniform flange height from material anisotropy — minimised by blank shape optimisation.</li>
+    </ul>
+  </div>
+</div>
+<div class="subtopic">
+  <div class="subtopic-header"><div class="subtopic-icon purple">⚡</div><div><div class="subtopic-title">Progressive Die &amp; Compound Die</div><div class="subtopic-sub">High-speed automated multi-operation stamping</div></div></div>
+  <div class="subtopic-body">
+    <p>A <strong>Progressive Die</strong> performs blanking, piercing, bending, and forming in sequential stations as the metal strip advances one pitch per stroke. Parts exit fully formed at 100–1,000+ strokes/min — no manual handling between operations.</p>
+    <p>A <strong>Compound Die</strong> performs simultaneous blanking and piercing in a single stroke — produces extremely flat, accurate blanks with tight hole-to-edge relationships.</p>
+    <ul class="detail-list">
+      <li><strong>Progressive die advantages:</strong> High throughput, consistent quality, ideal for terminals, brackets, clips, connectors.</li>
+      <li><strong>Progressive die cost:</strong> Tooling $20,000–$500,000+. Economical above ~50,000–100,000 parts/year.</li>
+    </ul>
+  </div>
+</div>
+<div class="qa-section-title">Interview Questions</div>
+<div class="qa-card" onclick="toggleQA(this)"><div class="qa-question"><span class="q-num">Q1</span><span class="q-text">What is die clearance and what happens if it is too large or too small?</span><span class="q-toggle">+</span></div><div class="qa-answer"><div class="ans-text"><strong>Die clearance</strong> is the gap between punch and die wall per side, expressed as % of material thickness.</div><div class="formula">Correct clearance = 5–10% × material thickness t per side</div><div class="key-points"><div class="key-points-title">Effects of Wrong Clearance</div><ul><li><strong>Too little (&lt;5%):</strong> Excessive shear force, rough edges, punch wear, punch breakage risk</li><li><strong>Too much (&gt;15%):</strong> Large burr, rollover on cut edge, poor dimensional accuracy</li><li><strong>Correct:</strong> Clean shear band, minimal burr, optimal tool life</li></ul></div></div></div>
+<div class="tags"><span class="tag">Blanking / Piercing</span><span class="tag orange">Air Bending</span><span class="tag orange">Deep Drawing</span><span class="tag green">Progressive Die</span><span class="tag">Laser / Waterjet</span></div>
+</div>
+
+<!-- T4: CASTING DESIGN -->
+<div id="t4" class="topic-section">
+<div class="topic-header">
+  <div class="topic-tag">Topic 04 · Design Guidelines</div>
+  <div class="topic-title">Casting Parts Design</div>
+  <div class="progress-bar"></div>
+</div>
+<div class="overview-card">
+  <div class="overview-badge">🔶 Overview</div>
+  <div class="overview-title">Designing for Castability</div>
+  <div class="overview-text">Good casting design minimises defects, reduces machining, enables clean mould release, and controls dimensional accuracy. The five key design principles are: <strong>draft angles</strong> for mould release, <strong>uniform wall thickness</strong> for even solidification, <strong>generous fillets</strong> to reduce stress concentration and improve flow, <strong>correct parting line placement</strong>, and <strong>avoiding undercuts</strong> where possible. Design rules vary by casting process — die casting needs less draft than sand casting due to its steel mould and ejector pins.</div>
+  <div class="overview-grid">
+    <div class="overview-grid-item"><div class="ogi-label">Draft (Die Cast Al)</div><div class="ogi-val">0.5° – 2° external</div></div>
+    <div class="overview-grid-item"><div class="ogi-label">Min Wall (Die Cast Al)</div><div class="ogi-val">1.5 – 5 mm</div></div>
+    <div class="overview-grid-item"><div class="ogi-label">Min Internal Fillet</div><div class="ogi-val">R = 1 – 2 × wall thickness</div></div>
+    <div class="overview-grid-item"><div class="ogi-label">Surface Finish (Die Cast)</div><div class="ogi-val">Ra 0.8 – 2 µm</div></div>
+  </div>
+</div>
+<div class="subtopic">
+  <div class="subtopic-header"><div class="subtopic-icon blue">📐</div><div><div class="subtopic-title">Draft Angle</div><div class="subtopic-sub">Enabling clean mould release without tearing or sticking</div></div></div>
+  <div class="subtopic-body">
+    <p>Draft angle is intentional taper on all surfaces parallel to the pull direction. Without draft, the shrinking casting grips mould walls and cannot be extracted. Draft is measured from the direction of draw.</p>
+    <table class="info-table"><tr><th>Process</th><th>External Walls</th><th>Internal / Core</th><th>Textured Surface</th></tr>
+    <tr><td>Al Die Casting</td><td>0.5° – 2°</td><td>2° – 3°</td><td>Add 1° per 0.025 mm depth</td></tr>
+    <tr><td>Sand Casting</td><td>2° – 5°</td><td>3° – 7°</td><td>3° – 7°</td></tr>
+    <tr><td>Investment Casting</td><td>0° – 1°</td><td>1° – 2°</td><td>0° – 1°</td></tr>
+    <tr><td>Injection Moulding</td><td>1° – 2°</td><td>2° – 5°</td><td>Add 1.5° per 0.025 mm</td></tr></table>
+    <div class="alert info"><span class="alert-icon">💡</span> Internal features always need MORE draft — the shrinking casting tightens around them, creating more extraction resistance.</div>
+  </div>
+</div>
+<div class="subtopic">
+  <div class="subtopic-header"><div class="subtopic-icon orange">🔲</div><div><div class="subtopic-title">Wall Thickness, Undercuts, Parting Line &amp; Fillets</div><div class="subtopic-sub">Four interconnected casting design decisions</div></div></div>
+  <div class="subtopic-body">
+    <p><strong>Uniform wall thickness</strong> is critical. Non-uniform walls cause differential solidification — thick sections cool slowly, thin sections fast. This causes shrinkage porosity (last area to solidify pulls metal inward), hot tearing (solidification cracking), and warpage. Keep wall variation within ±25% of nominal; use gradual tapers for unavoidable transitions.</p>
+    <p><strong>Undercuts</strong> are features preventing straight mould extraction. Solutions: side-actions/slides (add $5k–$30k+ per action), lifters, collapsible cores, or redesign to eliminate. Always try to design undercuts out first.</p>
+    <p><strong>Parting line</strong> placement affects accuracy, appearance, and tooling cost. Best practice: place at the largest cross-section, keep in a single plane, avoid critical sealing surfaces.</p>
+    <p><strong>Fillets</strong> at internal corners prevent stress concentration, improve metal flow, and reduce hot tearing risk. Minimum R = 1–2× wall thickness. Sharp internal corners almost always crack in service.</p>
+  </div>
+</div>
+<div class="qa-section-title">Interview Questions</div>
+<div class="qa-card" onclick="toggleQA(this)"><div class="qa-question"><span class="q-num">Q1</span><span class="q-text">What is Chvorinov's Rule and how is it applied?</span><span class="q-toggle">+</span></div><div class="qa-answer"><div class="formula">Solidification Time ∝ (Volume / Surface Area)²</div><div class="ans-text">A sphere solidifies slowest (highest V/SA); a thin plate solidifies fastest. Use it to size risers larger than the section they feed (riser must solidify last) and predict which sections are most prone to porosity. Shrinkage allowance: Al 1.3–1.6%, Steel 2.0%, Grey Iron 1.0%, Brass 1.5%.</div></div></div>
+<div class="tags"><span class="tag">Draft Angle</span><span class="tag orange">Parting Line</span><span class="tag orange">Undercuts</span><span class="tag green">Chvorinov's Rule</span><span class="tag">Uniform Wall Thickness</span></div>
+</div>
+
+<!-- T5: CASTING MFG -->
+<div id="t5" class="topic-section">
+<div class="topic-header">
+  <div class="topic-tag">Topic 05 · Manufacturing Process</div>
+  <div class="topic-title">Casting Manufacturing Processes</div>
+  <div class="progress-bar"></div>
+</div>
+<div class="overview-card">
+  <div class="overview-badge">🔥 Overview</div>
+  <div class="overview-title">Casting Process Families</div>
+  <div class="overview-text">Casting pours molten metal into a mould, allows solidification, then extracts the solid part. The main processes are <strong>Sand Casting</strong> (expendable mould, all metals, low tooling cost, large parts), <strong>High Pressure Die Casting (HPDC)</strong> (permanent steel die, Al/Zn/Mg, high volume, net shape), <strong>Investment / Lost Wax Casting</strong> (ceramic shell, complex geometry, all alloys including SS and superalloys), and <strong>Centrifugal Casting</strong> (rotating mould, pipes and rings). Selection depends on volume, material, geometry complexity, and required accuracy.</div>
+  <div class="overview-grid">
+    <div class="overview-grid-item"><div class="ogi-label">Highest Volume</div><div class="ogi-val">HPDC (Die Casting)</div></div>
+    <div class="overview-grid-item"><div class="ogi-label">Most Complex Geometry</div><div class="ogi-val">Investment Casting</div></div>
+    <div class="overview-grid-item"><div class="ogi-label">Lowest Tooling Cost</div><div class="ogi-val">Sand Casting</div></div>
+    <div class="overview-grid-item"><div class="ogi-label">Best Accuracy</div><div class="ogi-val">HPDC ±0.1 mm</div></div>
+  </div>
+</div>
+<div class="subtopic">
+  <div class="subtopic-header"><div class="subtopic-icon blue">🏺</div><div><div class="subtopic-title">Sand Casting — Step by Step</div><div class="subtopic-sub">Most versatile process for all metals and large parts</div></div></div>
+  <div class="subtopic-body">
+    <ul class="detail-list">
+      <li><strong>Pattern making:</strong> Create pattern (wood/Al/steel) slightly oversize for shrinkage allowance. Add draft to all vertical faces.</li>
+      <li><strong>Mould making:</strong> Pack green sand (silica + clay + water) around pattern in flask. Cope = top half, Drag = bottom half.</li>
+      <li><strong>Core placement:</strong> Insert sand cores for internal cavities or holes.</li>
+      <li><strong>Gating system:</strong> Sprue (vertical entry) → Runner (horizontal) → Gate (cavity entry) → Riser (feed metal). Remove pattern and assemble mould.</li>
+      <li><strong>Pouring:</strong> Molten metal at correct temperature and controlled flow rate.</li>
+      <li><strong>Cooling &amp; shakeout:</strong> Allow full solidification. Break mould. Extract casting.</li>
+      <li><strong>Fettling:</strong> Remove gates and risers, shot blast, grind, inspect. Tolerances: ±1–3 mm, Ra 6.3–25 µm.</li>
+    </ul>
+  </div>
+</div>
+<div class="subtopic">
+  <div class="subtopic-header"><div class="subtopic-icon orange">💨</div><div><div class="subtopic-title">High Pressure Die Casting — Hot vs Cold Chamber</div><div class="subtopic-sub">Why aluminium always uses cold chamber machines</div></div></div>
+  <div class="subtopic-body">
+    <table class="info-table"><tr><th>Feature</th><th>Hot Chamber</th><th>Cold Chamber</th></tr>
+    <tr><td>Injection system</td><td>Permanently submerged in melt — fast cycle</td><td>Separate ladle per shot</td></tr>
+    <tr><td>Injection pressure</td><td>7–35 MPa</td><td>14–140 MPa</td></tr>
+    <tr><td>Cycle rate</td><td>400–900 shots/hr</td><td>75–150 shots/hr</td></tr>
+    <tr><td>Materials</td><td>Zinc, Tin, Lead (low melting point)</td><td>Aluminium, Magnesium, Brass</td></tr>
+    <tr><td>Why not Al in hot?</td><td colspan="2">Liquid Al attacks and dissolves the submerged steel gooseneck/plunger — destroys the injection system within hours</td></tr></table>
+  </div>
+</div>
+<div class="subtopic">
+  <div class="subtopic-header"><div class="subtopic-icon green">🕯</div><div><div class="subtopic-title">Investment Casting (Lost Wax)</div><div class="subtopic-sub">Complex geometry, any alloy, near-zero draft required</div></div></div>
+  <div class="subtopic-body">
+    <p>A wax pattern is created in a metal die, assembled into a tree, dipped in ceramic slurry 8–12 times to build a shell, then dewaxed in a steam autoclave. The ceramic shell is fired at 1,000°C and molten metal (any alloy — Ti, SS, Inconel) is poured into the hot shell. After cooling, ceramic is broken off. Because there is <strong>no parting line and no mould opening direction</strong>, almost any geometry including undercuts can be cast.</p>
+    <ul class="detail-list">
+      <li><strong>Tolerance:</strong> ±0.1–0.3 mm; Ra 1.6–3.2 µm — often used directly without machining</li>
+      <li><strong>Best for:</strong> Turbine blades, surgical implants, jewellery, firearms components, complex aerospace brackets</li>
+      <li><strong>Tooling cost:</strong> Medium ($5k–$50k for wax die); no expensive steel die as in HPDC</li>
+    </ul>
+  </div>
+</div>
+<div class="subtopic">
+  <div class="subtopic-header"><div class="subtopic-icon purple">🔴</div><div><div class="subtopic-title">Common Casting Defects</div><div class="subtopic-sub">Root causes and prevention methods</div></div></div>
+  <div class="subtopic-body">
+    <table class="info-table"><tr><th>Defect</th><th>Cause</th><th>Prevention</th></tr>
+    <tr><td><strong>Shrinkage Porosity</strong></td><td>Insufficient feed metal during solidification</td><td>Proper riser size/location, directional solidification</td></tr>
+    <tr><td><strong>Gas Porosity</strong></td><td>Dissolved H₂ (Al) or CO released on cooling</td><td>Degassing melt, dry mould, controlled temperature</td></tr>
+    <tr><td><strong>Cold Shut</strong></td><td>Two streams meet at low temperature and fail to fuse</td><td>Increase pour temperature and flow rate</td></tr>
+    <tr><td><strong>Misrun</strong></td><td>Metal solidifies before cavity fills</td><td>Increase temp, add vents, reduce section thickness</td></tr>
+    <tr><td><strong>Hot Tear</strong></td><td>Tensile stress during solidification in restrained regions</td><td>Generous fillets, uniform walls, flexible mould</td></tr>
+    <tr><td><strong>Flash</strong></td><td>Metal leaks at parting line — insufficient clamping</td><td>Increase clamp force, inspect parting line wear</td></tr></table>
+  </div>
+</div>
+<div class="qa-section-title">Interview Questions</div>
+<div class="qa-card" onclick="toggleQA(this)"><div class="qa-question"><span class="q-num">Q1</span><span class="q-text">Compare Sand Casting vs Die Casting vs Investment Casting.</span><span class="q-toggle">+</span></div><div class="qa-answer"><table class="info-table"><tr><th>Parameter</th><th>Sand Casting</th><th>Die Casting</th><th>Investment Casting</th></tr><tr><td>Tolerance</td><td>±1–3 mm</td><td>±0.1 mm</td><td>±0.1–0.3 mm</td></tr><tr><td>Surface Ra</td><td>6.3–25 µm</td><td>0.8–2 µm</td><td>1.6–3.2 µm</td></tr><tr><td>Tooling cost</td><td>Low</td><td>Very high</td><td>Medium</td></tr><tr><td>Volume</td><td>1 – 50k</td><td>50k – 1M+</td><td>100 – 100k</td></tr><tr><td>Materials</td><td>All metals</td><td>Al, Zn, Mg only</td><td>All including SS, Ti, Inconel</td></tr></table></div></div>
+<div class="tags"><span class="tag">Sand Casting</span><span class="tag orange">HPDC Die Casting</span><span class="tag orange">Investment/Lost Wax</span><span class="tag green">Porosity Defects</span><span class="tag">Gating System</span></div>
+</div>
+
+<!-- T6: PLASTIC DESIGN -->
+<div id="t6" class="topic-section">
+<div class="topic-header">
+  <div class="topic-tag">Topic 06 · Design Guidelines</div>
+  <div class="topic-title">Plastic Part Design</div>
+  <div class="progress-bar"></div>
+</div>
+<div class="overview-card">
+  <div class="overview-badge">🧩 Overview</div>
+  <div class="overview-title">Designing Injection Moulded Plastic Parts</div>
+  <div class="overview-text">Plastic part design requires understanding polymer behaviour — they shrink more than metals (0.5–3%), are weaker in the mould flow direction, and are susceptible to <strong>sink marks, warpage, weld lines, and residual stress</strong> if poorly designed. Key elements: <strong>uniform wall thickness</strong> (most critical), correct <strong>boss and rib geometry</strong>, functional <strong>snap fits and living hinges</strong>, adequate <strong>draft angles</strong>, and gate location for good mould fill. Guidelines vary by material — ABS, PC, PP, PA, and POM each have different optimal proportions.</div>
+  <div class="overview-grid">
+    <div class="overview-grid-item"><div class="ogi-label">Most Critical Rule</div><div class="ogi-val">Uniform wall thickness</div></div>
+    <div class="overview-grid-item"><div class="ogi-label">Typical Draft</div><div class="ogi-val">1° – 2° external</div></div>
+    <div class="overview-grid-item"><div class="ogi-label">Typical Shrinkage</div><div class="ogi-val">0.5% (PC) – 2.5% (PP)</div></div>
+    <div class="overview-grid-item"><div class="ogi-label">Living Hinge Material</div><div class="ogi-val">Polypropylene (PP)</div></div>
+  </div>
+</div>
+<div class="subtopic">
+  <div class="subtopic-header"><div class="subtopic-icon blue">🧱</div><div><div class="subtopic-title">Wall Thickness Guidelines by Material</div><div class="subtopic-sub">Foundation of all plastic part design decisions</div></div></div>
+  <div class="subtopic-body">
+    <p>Wall thickness is the single most important variable. Thick walls increase cooling time (∝ thickness²), cause sink marks, and promote warpage. Thin walls risk short shots and structural failure.</p>
+    <table class="info-table"><tr><th>Material</th><th>Recommended Wall</th><th>Absolute Min</th></tr>
+    <tr><td>ABS</td><td>1.5 – 4.5 mm</td><td>0.75 mm</td></tr>
+    <tr><td>Polycarbonate (PC)</td><td>1.0 – 4.0 mm</td><td>0.50 mm</td></tr>
+    <tr><td>Polypropylene (PP)</td><td>0.8 – 3.8 mm</td><td>0.50 mm</td></tr>
+    <tr><td>Nylon PA 6/66</td><td>1.0 – 3.0 mm</td><td>0.40 mm</td></tr>
+    <tr><td>POM (Acetal)</td><td>0.8 – 3.0 mm</td><td>0.40 mm</td></tr></table>
+    <div class="alert warning"><span class="alert-icon">⚠️</span> Keep wall variation within ±25% of nominal. Where transitions are unavoidable, taper over a length ≥ 3× the thickness change.</div>
+  </div>
+</div>
+<div class="subtopic">
+  <div class="subtopic-header"><div class="subtopic-icon orange">🔘</div><div><div class="subtopic-title">Boss Design Rules</div><div class="subtopic-sub">Mounting points for screws, inserts, and alignment pins</div></div></div>
+  <div class="subtopic-body">
+    <ul class="detail-list">
+      <li><strong>Outer diameter:</strong> 2.0–2.5× screw/insert outer diameter</li>
+      <li><strong>Wall thickness:</strong> Maximum 60% of nominal wall — prevents sink marks on opposite cosmetic face</li>
+      <li><strong>Base fillet radius:</strong> Minimum R = 0.25–0.50 mm to reduce stress concentration</li>
+      <li><strong>Draft:</strong> 0.5°–1° on inner bore and outer wall</li>
+      <li><strong>Height:</strong> Maximum 3× outer diameter without gussets. Taller bosses need ≥3 equally-spaced gussets (gusset t = 50% of boss wall)</li>
+      <li><strong>Why 60% rule matters:</strong> Thicker boss wall creates a local thick section. Surface solidifies, thick core contracts and pulls surface inward — causing a visible sink mark on the opposite face.</li>
+    </ul>
+  </div>
+</div>
+<div class="subtopic">
+  <div class="subtopic-header"><div class="subtopic-icon green">🦴</div><div><div class="subtopic-title">Rib Design Rules</div><div class="subtopic-sub">Adding structural stiffness without adding wall thickness</div></div></div>
+  <div class="subtopic-body">
+    <ul class="detail-list">
+      <li><strong>Rib thickness:</strong> 50–60% of the nominal wall it connects to</li>
+      <li><strong>Rib height:</strong> Maximum 2.5–3× nominal wall thickness</li>
+      <li><strong>Base fillet:</strong> R = minimum 0.5× rib thickness</li>
+      <li><strong>Draft:</strong> 0.5°–1° per side on rib faces</li>
+      <li><strong>Spacing:</strong> ≥ 2× rib thickness between adjacent ribs (airflow for cooling)</li>
+      <li><strong>Orientation:</strong> Align ribs along primary load/stress direction for maximum stiffness contribution</li>
+    </ul>
+  </div>
+</div>
+<div class="subtopic">
+  <div class="subtopic-header"><div class="subtopic-icon purple">🔗</div><div><div class="subtopic-title">Snap Fits &amp; Living Hinges</div><div class="subtopic-sub">Integral fastening and hinge features — design and material selection</div></div></div>
+  <div class="subtopic-body">
+    <p><strong>Snap fits</strong> use elastic deformation to assemble parts without fasteners. Cantilever snap fits are most common. The arm deflects during assembly then springs back to lock.</p>
+    <div class="formula">Max Strain ε = 1.5 × δ × t / L²
+Allowable strains: ABS 2% | PC 4% | PP 6% | PA 4%</div>
+    <p>Increase L or decrease t to reduce strain. Engagement angle: 30°–45° for insertion. Retention angle: 90° = permanent; 15°–30° = releasable.</p>
+    <p><strong>Living hinges</strong> are thin flexible sections (0.2–0.5 mm) integral to the part. Polypropylene (PP) is the only viable material for production living hinges — exceptional fatigue resistance, withstanding millions of flex cycles. Gate must flow <em>across</em> the hinge (perpendicular) to orient polymer chains along the flex direction. Flex while still warm after ejection (&lt;2 min) to further align chains.</p>
+  </div>
+</div>
+<div class="qa-section-title">Interview Questions</div>
+<div class="qa-card" onclick="toggleQA(this)"><div class="qa-question"><span class="q-num">Q1</span><span class="q-text">Why does rib thickness greater than 60% of wall cause sink marks?</span><span class="q-toggle">+</span></div><div class="qa-answer"><div class="ans-text">When the rib-wall junction is too thick, it becomes a local thick section. The cosmetic surface solidifies first. The thick junction beneath continues shrinking as it cools, pulling the already-solidified outer surface inward — creating a visible sink depression on the cosmetic face opposite the rib. Keeping rib thickness ≤60% of nominal wall ensures the rib base cools at a comparable rate to the wall, preventing differential shrinkage at that junction.</div></div></div>
+<div class="tags"><span class="tag">Wall Thickness</span><span class="tag orange">Boss 60% Rule</span><span class="tag orange">Rib Design</span><span class="tag green">Living Hinge PP</span><span class="tag green">Snap Fit</span><span class="tag purple">Draft Angle</span></div>
+</div>
+
+<!-- T7: INJECTION MOULDING -->
+<div id="t7" class="topic-section">
+<div class="topic-header">
+  <div class="topic-tag">Topic 07 · Manufacturing Process</div>
+  <div class="topic-title">Injection Moulding Basics</div>
+  <div class="progress-bar"></div>
+</div>
+<div class="overview-card">
+  <div class="overview-badge">💉 Overview</div>
+  <div class="overview-title">What is Injection Moulding?</div>
+  <div class="overview-text">Injection moulding is the dominant plastic manufacturing process. Granular thermoplastic is melted by a reciprocating screw, then injected under high pressure into a cooled steel mould. After solidification, the mould opens and ejector pins release the part. Cycle times: 10–120 seconds depending on wall thickness. Key parameters: <strong>clamp force, injection pressure, melt temperature, mould temperature, pack/hold pressure, and cooling time</strong>. Tooling cost is high ($10k–$500k+) but unit costs are very low at volume.</div>
+  <div class="overview-grid">
+    <div class="overview-grid-item"><div class="ogi-label">Cycle Time</div><div class="ogi-val">10 – 120 seconds</div></div>
+    <div class="overview-grid-item"><div class="ogi-label">Typical Tolerance</div><div class="ogi-val">±0.05 – 0.3 mm</div></div>
+    <div class="overview-grid-item"><div class="ogi-label">Clamp Force Range</div><div class="ogi-val">5 – 5,000 tonnes</div></div>
+    <div class="overview-grid-item"><div class="ogi-label">Min Economic Volume</div><div class="ogi-val">~1,000 parts (typical)</div></div>
+  </div>
+</div>
+<div class="subtopic">
+  <div class="subtopic-header"><div class="subtopic-icon blue">⚙</div><div><div class="subtopic-title">The 5-Phase Injection Moulding Cycle</div><div class="subtopic-sub">From mould close to part ejection</div></div></div>
+  <div class="subtopic-body">
+    <ul class="detail-list">
+      <li><strong>Phase 1 — Mould Closing &amp; Clamping:</strong> Moving platen closes mould. Clamp force built up to resist cavity pressure during injection. Formula: Clamp = Projected Area × Cavity Pressure × Safety Factor.</li>
+      <li><strong>Phase 2 — Injection / Fill:</strong> Screw acts as plunger. Molten plastic injected through nozzle → sprue → runner → gate → cavity. Fill phase = 95–99% of cavity volume.</li>
+      <li><strong>Phase 3 — Pack &amp; Hold:</strong> Additional material forced in at lower pressure to compensate shrinkage. Held until gate freezes (solidifies). Critical for dimensional accuracy and surface quality.</li>
+      <li><strong>Phase 4 — Cooling:</strong> Part solidifies in mould. Longest phase — 50–70% of cycle time. Cooling time ∝ (wall thickness)² / thermal diffusivity.</li>
+      <li><strong>Phase 5 — Mould Open &amp; Eject:</strong> Clamp opens, ejector pins push part out. Screw simultaneously rotates and retracts to plasticate next shot — parallel activity during cooling.</li>
+    </ul>
+    <div class="formula">Cycle Time = Fill + Pack/Hold + Cooling + Open/Eject + Close  (10–120 sec)</div>
+  </div>
+</div>
+<div class="subtopic">
+  <div class="subtopic-header"><div class="subtopic-icon orange">🚪</div><div><div class="subtopic-title">Runner Systems &amp; Gate Types</div><div class="subtopic-sub">Cold runner vs hot runner · 6 gate types and when to use each</div></div></div>
+  <div class="subtopic-body">
+    <p>A <strong>cold runner</strong> solidifies each shot and is ejected as waste. A <strong>hot runner</strong> keeps plastic permanently molten using heated manifolds — no runner waste, faster cycle, better quality, but adds $15k–$100k+ to tooling cost.</p>
+    <table class="info-table"><tr><th>Gate Type</th><th>Best For</th><th>Auto-Degate?</th><th>Note</th></tr>
+    <tr><td>Sprue (direct)</td><td>Single cavity, thick parts</td><td>No — manual trim</td><td>Largest witness mark</td></tr>
+    <tr><td>Edge / Side</td><td>Most common, flat/thin parts</td><td>No</td><td>Edge witness mark</td></tr>
+    <tr><td>Submarine / Tunnel</td><td>Multi-cavity, high volume</td><td>Yes</td><td>Softer materials only</td></tr>
+    <tr><td>Hot Tip / Valve Gate</td><td>No waste, cleanest mark</td><td>Yes (hot runner)</td><td>Highest tooling cost</td></tr>
+    <tr><td>Film / Fan</td><td>Large flat parts, min warpage</td><td>No</td><td>Manual trim needed</td></tr></table>
+  </div>
+</div>
+<div class="subtopic">
+  <div class="subtopic-header"><div class="subtopic-icon green">💪</div><div><div class="subtopic-title">Clamping Force Calculation</div><div class="subtopic-sub">Sizing the injection moulding machine correctly</div></div></div>
+  <div class="subtopic-body">
+    <div class="formula">Clamp Force (tonnes) = Projected Area (cm²) × Cavity Pressure (MPa) × Safety Factor / 100
+Typical cavity pressure: 20–50 MPa  |  SF: 1.1–1.25
+Rule of thumb: 2–5 tonnes per cm² of projected area</div>
+    <ul class="detail-list">
+      <li><strong>Example:</strong> Area = 120 cm², P = 35 MPa, SF = 1.1 → Clamp = 120 × 35 × 1.1 / 100 = <strong>46.2 tonnes</strong></li>
+      <li><strong>Undersize clamp → Flash:</strong> Mould opens slightly during injection, plastic escapes at parting line as thin fins</li>
+      <li><strong>Machine selection:</strong> Choose machine with clamp 20–30% above calculated value to allow for process variation</li>
+    </ul>
+  </div>
+</div>
+<div class="qa-section-title">Interview Questions</div>
+<div class="qa-card" onclick="toggleQA(this)"><div class="qa-question"><span class="q-num">Q1</span><span class="q-text">What is pack/hold pressure and why is it critical to part quality?</span><span class="q-toggle">+</span></div><div class="qa-answer"><div class="ans-text"><strong>Pack pressure</strong> is applied immediately after fill to push additional material into the cavity to compensate for volumetric shrinkage during cooling. <strong>Hold pressure</strong> is maintained until the gate freezes off — after which no more material can enter. Too little pack/hold → excessive shrinkage, sink marks, dimensional undersize. Too much → overpacking, flash, internal stress, difficult ejection. Correct hold time is determined by a gate freeze study: weigh parts at increasing hold times until weight plateaus — that plateau point is gate freeze-off.</div></div></div>
+<div class="tags"><span class="tag">5-Phase Cycle</span><span class="tag orange">Gate Types</span><span class="tag orange">Hot Runner</span><span class="tag green">Clamp Force</span><span class="tag">Pack / Hold</span><span class="tag purple">Cold Runner</span></div>
+</div>
+
+<!-- T8: MOULDING DEFECTS -->
+<div id="t8" class="topic-section">
+<div class="topic-header">
+  <div class="topic-tag">Topic 08 · Quality &amp; Defects</div>
+  <div class="topic-title">Plastic &amp; Moulding Defects</div>
+  <div class="progress-bar"></div>
+</div>
+<div class="overview-card">
+  <div class="overview-badge">🔍 Overview</div>
+  <div class="overview-title">Injection Moulding Defects — Three Root Cause Families</div>
+  <div class="overview-text">All injection moulding defects arise from three root cause areas: <strong>Part design issues</strong> (non-uniform walls, poor gate location, insufficient draft), <strong>Mould design issues</strong> (inadequate venting, poor cooling balance, wrong gate size), and <strong>Process parameter issues</strong> (incorrect temperatures, pressures, speeds, cycle times). The same visible defect can have multiple different root causes — always investigate root cause before applying a fix. The 8 major defects are: Sink Marks, Warpage, Short Shot, Flash, Weld Lines, Burn Marks, Jetting, and Delamination.</div>
+</div>
+<div class="subtopic">
+  <div class="subtopic-header"><div class="subtopic-icon blue">📋</div><div><div class="subtopic-title">8 Major Defects — Cause &amp; Remedy</div><div class="subtopic-sub">Design fix vs process fix for each defect</div></div></div>
+  <div class="subtopic-body">
+    <table class="info-table"><tr><th>Defect</th><th>Root Cause</th><th>Design Fix</th><th>Process Fix</th></tr>
+    <tr><td><strong>Sink Mark</strong></td><td>Thick section — differential shrinkage pulls surface inward</td><td>Rib t ≤60% wall; core out thick sections</td><td>↑ Pack pressure &amp; hold time; ↓ melt temp</td></tr>
+    <tr><td><strong>Warpage</strong></td><td>Non-uniform cooling, differential shrinkage, residual stress</td><td>Uniform walls; symmetric design; glass fill</td><td>Balance cooling channels; ↑ cooling time</td></tr>
+    <tr><td><strong>Short Shot</strong></td><td>Low pressure/speed; cold melt; blocked vents</td><td>Remove thin sections; reposition gate closer</td><td>↑ speed/pressure/melt temp; add vents</td></tr>
+    <tr><td><strong>Flash</strong></td><td>Insufficient clamp; worn parting line; excess injection P</td><td>Avoid features directly at parting line</td><td>↑ clamp force; ↓ injection P; inspect mould</td></tr>
+    <tr><td><strong>Weld Line</strong></td><td>Two flow fronts meet at low temperature, fail to fully fuse</td><td>Reposition gate; add overflow well at weld</td><td>↑ melt temp; ↑ injection speed; ↑ mould temp</td></tr>
+    <tr><td><strong>Burn Marks</strong></td><td>Trapped air compressed adiabatically (diesel effect) → chars plastic</td><td>Move gate away from trapped air location</td><td>Add vents; ↓ injection speed at end of fill</td></tr>
+    <tr><td><strong>Jetting</strong></td><td>Melt jets into cavity without touching walls — solidifies before blending</td><td>Enlarge/reposition gate; add flow deflector</td><td>↓ injection speed; ↑ melt &amp; mould temp</td></tr>
+    <tr><td><strong>Delamination</strong></td><td>Contamination; moisture; incompatible regrind; material degradation</td><td>Specify no regrind on critical surfaces</td><td>Dry material; clean barrel; purge machine</td></tr></table>
+  </div>
+</div>
+<div class="subtopic">
+  <div class="subtopic-header"><div class="subtopic-icon orange">🌡</div><div><div class="subtopic-title">Deep Dive: Warpage</div><div class="subtopic-sub">The most complex and costly moulding defect to resolve</div></div></div>
+  <div class="subtopic-body">
+    <p>Warpage is dimensional distortion after mould opening caused by differential shrinkage. Different areas of the part shrink by different amounts, creating internal bending stresses that deform the part after ejection.</p>
+    <ul class="detail-list">
+      <li><strong>Thermal differential:</strong> One mould half hotter → that side shrinks more → part bends toward hotter side.</li>
+      <li><strong>Flow-induced anisotropy:</strong> Semi-crystalline polymers (PP, PA, POM) shrink more perpendicular to flow direction — creates bow in flat parts.</li>
+      <li><strong>Glass-fibre reinforcement:</strong> Fibres align along flow, restricting shrinkage in that direction — extreme anisotropic warpage if flow is unbalanced.</li>
+      <li><strong>Fix hierarchy (most to least effective):</strong> Design fix (uniform wall) → Mould fix (balanced cooling) → Material fix (glass fill) → Process fix (longer cooling). Address in this order.</li>
+    </ul>
+  </div>
+</div>
+<div class="qa-section-title">Interview Questions</div>
+<div class="qa-card" onclick="toggleQA(this)"><div class="qa-question"><span class="q-num">Q1</span><span class="q-text">What is the diesel effect in injection moulding and how is it prevented?</span><span class="q-toggle">+</span></div><div class="qa-answer"><div class="ans-text">The <strong>diesel effect</strong> occurs when air trapped at the last fill point is rapidly compressed by the incoming melt front. Like a diesel engine, adiabatic compression heats the trapped air to 400–500°C+ — charring or burning the plastic material. The result: black/brown burn marks at the end of fill (thin ribs, corners, last-fill extremities). <strong>Prevention:</strong> add vents (0.01–0.04 mm deep channels) at last-fill locations; reduce injection speed at end of stroke; reposition gate to avoid air traps; ensure mould vents are not blocked by material buildup.</div></div></div>
+<div class="tags"><span class="tag">Sink Marks</span><span class="tag orange">Warpage</span><span class="tag orange">Flash</span><span class="tag green">Short Shot</span><span class="tag">Weld Lines</span><span class="tag purple">Diesel Effect</span></div>
+</div>
+
+<!-- T9: TOLERANCE STACKUP -->
+<div id="t9" class="topic-section">
+<div class="topic-header">
+  <div class="topic-tag">Topic 09 · Dimensional Analysis</div>
+  <div class="topic-title">Tolerance Stackup Analysis</div>
+  <div class="progress-bar"></div>
+</div>
+<div class="overview-card">
+  <div class="overview-badge">📊 Overview</div>
+  <div class="overview-title">What is Tolerance Stackup?</div>
+  <div class="overview-text">Tolerance stackup determines the cumulative variation of a critical assembly gap, clearance, or flush condition resulting from individual part tolerances. When parts are assembled, each part's dimensional variation combines — if total variation exceeds the functional requirement (minimum clearance goes negative = interference), the assembly fails. Two main methods: <strong>Worst Case (WC)</strong> — adds all tolerances directly, guarantees 100% assembly yield, conservative; <strong>RSS Statistical</strong> — uses square root of sum of squares, assumes normal distributions, guarantees ~99.73% yield at 3σ, less conservative but realistic for high-volume production.</div>
+  <div class="overview-grid">
+    <div class="overview-grid-item"><div class="ogi-label">Worst Case Formula</div><div class="ogi-val">T = Σ |ti| (100% yield)</div></div>
+    <div class="overview-grid-item"><div class="ogi-label">RSS Formula</div><div class="ogi-val">T = √(Σ ti²) (~99.73%)</div></div>
+    <div class="overview-grid-item"><div class="ogi-label">Software Tools</div><div class="ogi-val">Excel, CETOL, 3DCS, VisVSA</div></div>
+    <div class="overview-grid-item"><div class="ogi-label">Best Application</div><div class="ogi-val">Assembly clearance &amp; fit analysis</div></div>
+  </div>
+</div>
+<div class="subtopic">
+  <div class="subtopic-header"><div class="subtopic-icon blue">🔗</div><div><div class="subtopic-title">1D Stackup — Step-by-Step Method</div><div class="subtopic-sub">The tolerance loop approach</div></div></div>
+  <div class="subtopic-body">
+    <ul class="detail-list">
+      <li><strong>Step 1 — Define requirement:</strong> What critical gap, clearance, or flush condition must be controlled?</li>
+      <li><strong>Step 2 — Draw the loop:</strong> Trace a continuous path from one end to the other through each contributing dimension in the assembly.</li>
+      <li><strong>Step 3 — Assign directions:</strong> Each dimension travelling in the positive direction gets (+); negative direction gets (−).</li>
+      <li><strong>Step 4 — Sum nominals:</strong> Nominal Gap = Σ (nominal × direction)</li>
+      <li><strong>Step 5 — Calculate total variation:</strong> WC: ±Σ|ti| | RSS: ±√(Σti²)</li>
+      <li><strong>Step 6 — Check vs requirement:</strong> Nominal Gap − Total Tol ≥ minimum required clearance</li>
+    </ul>
+    <div class="formula">Example: Housing 80±0.2 | Parts: A(30±0.1) + B(20±0.15) + C(15±0.1)
+Nominal Gap = 80−(30+20+15) = 15 mm
+WC Tol = ±(0.2+0.1+0.15+0.1) = ±0.55 mm → Min gap = 14.45 mm
+RSS Tol = ±√(0.04+0.01+0.023+0.01) = ±0.28 mm → Min gap = 14.72 mm</div>
+  </div>
+</div>
+<div class="subtopic">
+  <div class="subtopic-header"><div class="subtopic-icon orange">📉</div><div><div class="subtopic-title">Worst Case vs RSS — Selection Guide</div><div class="subtopic-sub">When each method is appropriate</div></div></div>
+  <div class="subtopic-body">
+    <table class="info-table"><tr><th>Method</th><th>Formula</th><th>Yield</th><th>Use When</th></tr>
+    <tr><td><strong>Worst Case</strong></td><td>T = Σ|ti|</td><td>100%</td><td>Safety-critical; low volume (&lt;100 units); small n (≤3 contributors)</td></tr>
+    <tr><td><strong>RSS</strong></td><td>T = √(Σti²)</td><td>~99.73%</td><td>High volume; normal distributions; ≥4 contributors</td></tr>
+    <tr><td><strong>Modified RSS (Cf=1.5)</strong></td><td>T = 1.5×√(Σti²)</td><td>~99.9%</td><td>Realistic conservative statistical — most commonly used in industry</td></tr></table>
+    <div class="alert warning"><span class="alert-icon">⚠️</span> RSS assumes normal distributions and statistical independence. If suppliers use limit gauging (non-normal), RSS underestimates variation — use WC or modified RSS.</div>
+  </div>
+</div>
+<div class="subtopic">
+  <div class="subtopic-header"><div class="subtopic-icon green">🛠</div><div><div class="subtopic-title">How to Reduce Stackup Without Tightening All Tolerances</div><div class="subtopic-sub">Cost-effective approaches to improve assembly yield</div></div></div>
+  <div class="subtopic-body">
+    <ul class="detail-list">
+      <li><strong>Reduce contributor count:</strong> Eliminate parts from the tolerance loop through redesign — fewer interfaces = less stackup.</li>
+      <li><strong>Tighten largest contributor only:</strong> The largest single tolerance dominates WC stackup. Tighten it for maximum benefit at minimum cost.</li>
+      <li><strong>MMC bonus tolerance:</strong> For clearance fits, applying MMC in GD&T provides free bonus tolerance as features depart from worst-case size.</li>
+      <li><strong>Selective assembly:</strong> Measure and sort components into bins — pair large-bin A with small-bin B to control assembly variation without changing tolerances.</li>
+      <li><strong>Adjustment features:</strong> Shims, adjusters, or slotted holes absorb accumulated variation.</li>
+    </ul>
+  </div>
+</div>
+<div class="qa-section-title">Interview Questions</div>
+<div class="qa-card" onclick="toggleQA(this)"><div class="qa-question"><span class="q-num">Q1</span><span class="q-text">Why is RSS less conservative than Worst Case, and is it safe to use?</span><span class="q-toggle">+</span></div><div class="qa-answer"><div class="ans-text">RSS is less conservative because it assumes it is statistically unlikely for all tolerances to simultaneously be at their worst-case extremes — just as it is unlikely to flip heads 10 times in a row. For a normal distribution, the probability of a dimension being at its extreme is very low. With many contributors, the probability of ALL being simultaneously at worst case approaches zero. RSS at ±3σ gives ~99.73% yield — meaning 0.27% of assemblies (2,700 per million) may technically be out of spec. This is generally acceptable for non-safety applications at high volume. For safety-critical parts or low volumes (&lt;100 units), Worst Case is required.</div></div></div>
+<div class="tags"><span class="tag">Worst Case</span><span class="tag orange">RSS Statistical</span><span class="tag green">Tolerance Loop</span><span class="tag">Selective Assembly</span><span class="tag purple">MMC Bonus Tol</span></div>
+</div>
+
+<!-- T10: PROJECTS -->
+<div id="t10" class="topic-section">
+<div class="topic-header">
+  <div class="topic-tag">Topic 10 · Career Preparation</div>
+  <div class="topic-title">Projects — Presenting Your Work</div>
+  <div class="progress-bar"></div>
+</div>
+<div class="overview-card">
+  <div class="overview-badge">🎯 Overview</div>
+  <div class="overview-title">How Interviewers Evaluate Your Projects</div>
+  <div class="overview-text">Project discussions are the most important part of engineering interviews. Interviewers use them to assess <strong>technical depth, design process maturity, problem-solving ability, ownership, and communication</strong>. The goal is not just to describe what you did — but to explain <em>why</em> you made specific design decisions, what trade-offs you navigated, and what measurable outcomes you achieved. Structure every project answer using the <strong>STAR method</strong> and always anchor your answers with specific numbers and technical decisions.</div>
+</div>
+<div class="subtopic">
+  <div class="subtopic-header"><div class="subtopic-icon blue">⭐</div><div><div class="subtopic-title">STAR Method — Framework for Every Project Answer</div><div class="subtopic-sub">Situation · Task · Action · Result</div></div></div>
+  <div class="subtopic-body">
+    <ul class="detail-list">
+      <li><strong>S — Situation:</strong> Product context, industry, customer requirements, key constraints (mass target, cost, operating environment, regulatory requirements).</li>
+      <li><strong>T — Task:</strong> Your specific role and responsibility. What was the design challenge you personally owned?</li>
+      <li><strong>A — Action:</strong> Design decisions YOU made — material selection rationale, process choice, GD&T applied, DFM improvements, FEA performed, DFMEA conducted, prototypes built and tested. Be specific about tools and methods.</li>
+      <li><strong>R — Result:</strong> Quantified outcome — "Reduced part count 12→7 = $0.45/unit at 500k volume = $225k/year saving"; "Passed 1.5 m drop test on first prototype build"; "Reduced cycle time 18% through DFM changes".</li>
+    </ul>
+    <div class="alert tip"><span class="alert-icon">✅</span> Interviewers score heavily on the R step. Always prepare quantified outcomes — numbers make your answer 3× more memorable and credible.</div>
+  </div>
+</div>
+<div class="subtopic">
+  <div class="subtopic-header"><div class="subtopic-icon orange">🔬</div><div><div class="subtopic-title">Key Design Decisions to Highlight</div><div class="subtopic-sub">What experienced engineers actually want to hear</div></div></div>
+  <div class="subtopic-body">
+    <ul class="detail-list">
+      <li><strong>Material selection rationale:</strong> Why this material vs alternatives — trade-offs of cost, weight, strength, corrosion, manufacturability, regulatory compliance.</li>
+      <li><strong>Manufacturing process choice:</strong> Why injection moulding vs casting vs machining vs sheet metal — volume, tolerance, geometry, lead time, investment.</li>
+      <li><strong>GD&T and tolerancing decisions:</strong> Which interfaces were critical, what tolerances you specified, whether you did a stackup analysis.</li>
+      <li><strong>DFM/DFA improvements:</strong> Specific design changes to simplify manufacturing or assembly — part count reduction, feature standardisation, assembly direction.</li>
+      <li><strong>DFMEA insights:</strong> Failure modes you anticipated and how you designed against them — demonstrates proactive engineering thinking.</li>
+      <li><strong>Trade-offs:</strong> What you gave up to meet a constraint — demonstrates engineering judgement and maturity.</li>
+      <li><strong>Validation:</strong> FEA results, prototype testing outcomes, DVT/PVT results — shows you close the loop between design intent and physical reality.</li>
+    </ul>
+  </div>
+</div>
+<div class="qa-section-title">Interview Questions</div>
+<div class="qa-card" onclick="toggleQA(this)"><div class="qa-question"><span class="q-num">Q1</span><span class="q-text">How do you present a project that failed or had significant problems?</span><span class="q-toggle">+</span></div><div class="qa-answer"><div class="ans-text">Failures are often more valuable than successes in interviews — they reveal analytical thinking, resilience, and learning agility. Frame using: (1) State what happened clearly — no excuses; (2) Root cause analysis — what technically went wrong; (3) What you learned; (4) Systemic change you implemented. Example: "Our snap fit failed drop testing at −20°C. Root cause: I hadn't accounted for ABS cold-temperature embrittlement — the available strain margin dropped from 3% to 1.5% at low temperature, below our 2% requirement. Fix: I added −20°C impact testing to our DVT matrix, redesigned with a tapered arm geometry to reduce peak strain, and switched material to PC/ABS blend with better low-temperature ductility. Second prototype passed."</div></div></div>
+<div class="tags"><span class="tag">STAR Method</span><span class="tag orange">Quantified Results</span><span class="tag green">Trade-off Decisions</span><span class="tag">Design Validation</span><span class="tag purple">Failure Analysis</span></div>
+</div>
+
+<!-- T11: BASIC MATERIALS -->
+<div id="t11" class="topic-section">
+<div class="topic-header">
+  <div class="topic-tag">Topic 11 · Materials Science</div>
+  <div class="topic-title">Basic Engineering Materials</div>
+  <div class="progress-bar"></div>
+</div>
+<div class="overview-card">
+  <div class="overview-badge">🔬 Overview</div>
+  <div class="overview-title">Material Selection — A Systematic Approach</div>
+  <div class="overview-text">Material selection determines cost, weight, strength, manufacturability, and service life simultaneously. The systematic approach uses <strong>Ashby selection charts</strong> — logarithmic property maps that allow direct performance comparison across all material families. Materials divide into: <strong>Metals</strong> (steels, aluminium, titanium, copper), <strong>Polymers</strong> (thermoplastics, thermosets, elastomers), <strong>Ceramics/Glasses</strong>, and <strong>Composites</strong> (CFRP, GFRP). Material indices guide optimal selection: for a stiff light beam use E^(1/2)/ρ; for a strong light beam use σy^(2/3)/ρ.</div>
+  <div class="overview-grid">
+    <div class="overview-grid-item"><div class="ogi-label">Stiffest Metal</div><div class="ogi-val">Tungsten (E = 400 GPa)</div></div>
+    <div class="overview-grid-item"><div class="ogi-label">Best Specific Strength</div><div class="ogi-val">Ti-6Al-4V (σy/ρ ≈ 200 kN·m/kg)</div></div>
+    <div class="overview-grid-item"><div class="ogi-label">Best Specific Stiffness</div><div class="ogi-val">CFRP (E/ρ ≈ 125 GPa·cc/g)</div></div>
+    <div class="overview-grid-item"><div class="ogi-label">Most Used Plastic</div><div class="ogi-val">Polypropylene (PP)</div></div>
+  </div>
+</div>
+<div class="subtopic">
+  <div class="subtopic-header"><div class="subtopic-icon blue">🏗</div><div><div class="subtopic-title">Key Metal Properties — Comparison Table</div><div class="subtopic-sub">Steel, Stainless, Aluminium, Titanium</div></div></div>
+  <div class="subtopic-body">
+    <table class="info-table"><tr><th>Material</th><th>Density (g/cc)</th><th>E (GPa)</th><th>Yield (MPa)</th><th>UTS (MPa)</th><th>CTE (µm/m°C)</th></tr>
+    <tr><td>Mild Steel 1018</td><td>7.85</td><td>200</td><td>250</td><td>410</td><td>12</td></tr>
+    <tr><td>SS 304 (annealed)</td><td>8.00</td><td>193</td><td>215</td><td>505</td><td>17.2</td></tr>
+    <tr><td>Al 6061-T6</td><td>2.70</td><td>68.9</td><td>276</td><td>310</td><td>23.6</td></tr>
+    <tr><td>Al 7075-T6</td><td>2.81</td><td>71.7</td><td>503</td><td>572</td><td>23.4</td></tr>
+    <tr><td>Ti-6Al-4V</td><td>4.43</td><td>114</td><td>880</td><td>950</td><td>8.6</td></tr></table>
+  </div>
+</div>
+<div class="subtopic">
+  <div class="subtopic-header"><div class="subtopic-icon orange">🧪</div><div><div class="subtopic-title">Engineering Plastics — ABS, PC, PP, PA, POM</div><div class="subtopic-sub">Strengths, weaknesses, and typical applications</div></div></div>
+  <div class="subtopic-body">
+    <table class="info-table"><tr><th>Material</th><th>Key Strengths</th><th>Key Weaknesses</th><th>Best Applications</th></tr>
+    <tr><td><strong>ABS</strong></td><td>Good impact, easy process, plates/paints well, low cost</td><td>Poor UV resistance, poor chemical resistance</td><td>Consumer electronics housings, automotive interior trim, Lego</td></tr>
+    <tr><td><strong>PC</strong></td><td>Very high impact (even at −40°C), optically clear, high heat deflection</td><td>Stress cracking with solvents/oils, notch sensitive</td><td>Safety helmets, lenses, transparent enclosures, phone screens</td></tr>
+    <tr><td><strong>PP</strong></td><td>Excellent fatigue (living hinges), chemical resistant, low density/cost</td><td>Poor low-temperature impact, UV degradation, low stiffness</td><td>Living hinges, packaging, food containers, medical devices</td></tr>
+    <tr><td><strong>PA (Nylon 6/66)</strong></td><td>High strength, good wear &amp; friction, temperature resistance to 120°C+</td><td>Absorbs moisture → dimensional change; weaker when wet</td><td>Gears, bearings, structural brackets, cable ties, intake manifolds</td></tr>
+    <tr><td><strong>POM (Acetal/Delrin)</strong></td><td>Best dimensional stability, lowest friction coefficient, excellent creep resistance</td><td>Not UV stable, very poor adhesion/bonding</td><td>Precision gears, cams, sliders, fuel system parts, zip ties</td></tr></table>
+  </div>
+</div>
+<div class="qa-section-title">Interview Questions</div>
+<div class="qa-card" onclick="toggleQA(this)"><div class="qa-question"><span class="q-num">Q1</span><span class="q-text">Walk through how you would systematically select a material for a new part.</span><span class="q-toggle">+</span></div><div class="qa-answer"><div class="key-points"><div class="key-points-title">Ashby Material Selection Process</div><ul><li><strong>1. Define requirements:</strong> Function (carry load, insulate), Constraints (min strength, max weight, temp range, regulatory), Objectives (minimise cost/mass), Free variable (material choice)</li><li><strong>2. Material indices:</strong> Derive index from objective + constraints. E.g. stiff light beam = E^(1/2)/ρ; strong light plate = σy^(1/2)/ρ</li><li><strong>3. Ashby chart:</strong> Plot candidates — materials above the selection line meet the index requirement</li><li><strong>4. Screen hard constraints:</strong> Eliminate materials failing non-negotiable limits (temperature, corrosion, regulatory)</li><li><strong>5. Decision matrix:</strong> Score remaining candidates against weighted criteria. Select highest scorer.</li><li><strong>6. Validate:</strong> Sample testing, supplier qualification, cost negotiation</li></ul></div></div></div>
+<div class="tags"><span class="tag">Steel 1018/304</span><span class="tag orange">Al 6061/7075</span><span class="tag green">Ti-6Al-4V</span><span class="tag">ABS/PC/PP/PA</span><span class="tag purple">Ashby Charts</span></div>
+</div>
+
+<!-- T12: FINISHING -->
+<div id="t12" class="topic-section">
+<div class="topic-header">
+  <div class="topic-tag">Topic 12 · Surface Engineering</div>
+  <div class="topic-title">Finishing Processes &amp; Methods</div>
+  <div class="progress-bar"></div>
+</div>
+<div class="overview-card">
+  <div class="overview-badge">✨ Overview</div>
+  <div class="overview-title">Surface Finishing — Purpose &amp; Key Processes</div>
+  <div class="overview-text">Surface finishing improves corrosion resistance, wear resistance, appearance, adhesion, and surface texture. Finishing must be designed for from the start — anodizing and electroplating change dimensions; powder coating fills recesses; some processes (hydrogen embrittlement from plating) can reduce mechanical properties on high-strength steels. Surface roughness is described by <strong>Ra</strong> (arithmetic mean deviation) and <strong>Rz</strong> (average peak-to-valley height). Always specify finish on drawings with the correct symbol, process callout, and required Ra/Rz value.</div>
+  <div class="overview-grid">
+    <div class="overview-grid-item"><div class="ogi-label">Anodize Type II adds</div><div class="ogi-val">12–15 µm per side</div></div>
+    <div class="overview-grid-item"><div class="ogi-label">Powder Coat thickness</div><div class="ogi-val">60–150 µm</div></div>
+    <div class="overview-grid-item"><div class="ogi-label">Mirror finish Ra</div><div class="ogi-val">0.025 – 0.05 µm</div></div>
+    <div class="overview-grid-item"><div class="ogi-label">Sand cast Ra</div><div class="ogi-val">6.3 – 25 µm</div></div>
+  </div>
+</div>
+<div class="subtopic">
+  <div class="subtopic-header"><div class="subtopic-icon blue">🛡</div><div><div class="subtopic-title">Anodizing — Type I, II, III</div><div class="subtopic-sub">Electrochemical conversion coating for aluminium</div></div></div>
+  <div class="subtopic-body">
+    <p>Anodizing converts the aluminium surface to aluminium oxide (Al₂O₃) electrochemically. The oxide grows ~50% outward and ~50% inward into the base material — so dimensions increase by half the total oxide thickness per surface.</p>
+    <table class="info-table"><tr><th>Type</th><th>Electrolyte</th><th>Thickness</th><th>Hardness</th><th>Best For</th></tr>
+    <tr><td>Type I</td><td>Chromic acid</td><td>0.5–2.5 µm</td><td>Soft</td><td>Aerospace fatigue-sensitive parts — minimal thickness impact</td></tr>
+    <tr><td>Type II</td><td>Sulfuric acid</td><td>5–25 µm</td><td>Moderate</td><td>General corrosion protection, dyeable for colour</td></tr>
+    <tr><td>Type III (Hard)</td><td>Cold sulfuric acid</td><td>25–75 µm</td><td>60–70 HRC equiv.</td><td>Wear surfaces, hydraulic cylinders, sliding contacts</td></tr></table>
+    <div class="alert info"><span class="alert-icon">💡</span> Design rule: Add 12–15 µm per side (Type II) in tolerance calculations. Sharp edges burn — add min R 0.3 mm to all edges before anodizing.</div>
+  </div>
+</div>
+<div class="subtopic">
+  <div class="subtopic-header"><div class="subtopic-icon orange">🎨</div><div><div class="subtopic-title">Powder Coating, Wet Paint &amp; Electroplating</div><div class="subtopic-sub">Organic coatings and metallic plating compared</div></div></div>
+  <div class="subtopic-body">
+    <table class="info-table"><tr><th>Process</th><th>Thickness</th><th>Key Pros</th><th>Key Cons</th><th>Design Note</th></tr>
+    <tr><td><strong>Powder Coat</strong></td><td>60–150 µm</td><td>Durable, VOC-free, wide colour range, one coat</td><td>Thick — affects tolerances, hard in deep recesses</td><td>Mask precision holes; no thin fins &lt;0.5 mm</td></tr>
+    <tr><td><strong>Wet Paint</strong></td><td>25–80 µm</td><td>Complex shapes, colour flexibility, low setup</td><td>VOC emissions, less durable, multi-coat process</td><td>Not suitable for food contact without special grade</td></tr>
+    <tr><td><strong>Zinc Plating</strong></td><td>8–25 µm</td><td>Excellent galvanic corrosion protection on steel</td><td>H₂ embrittlement risk on high-strength steel &gt;1,000 MPa</td><td>Bake at 190–220°C within 4h of plating to drive out H₂</td></tr>
+    <tr><td><strong>Nickel Plating</strong></td><td>10–50 µm</td><td>Good hardness, wear, corrosion, solderable</td><td>H₂ embrittlement risk, higher cost</td><td>Electronics connectors, precision shafts</td></tr></table>
+  </div>
+</div>
+<div class="subtopic">
+  <div class="subtopic-header"><div class="subtopic-icon green">📏</div><div><div class="subtopic-title">Surface Roughness — Ra, Rz &amp; Process Reference</div><div class="subtopic-sub">Understanding and specifying surface texture correctly</div></div></div>
+  <div class="subtopic-body">
+    <p><strong>Ra</strong> is the arithmetic mean of absolute deviations from the mean line — the most widely used single-value roughness parameter. <strong>Rz</strong> is the average height of the 5 highest peaks to 5 lowest valleys — better for sealing surfaces. Rz ≈ 4–7 × Ra typically.</p>
+    <table class="info-table"><tr><th>Manufacturing Process</th><th>Typical Ra (µm)</th><th>Application</th></tr>
+    <tr><td>Lapping / Honing</td><td>0.025 – 0.4</td><td>Bearing bores, sealing surfaces, gauge blocks</td></tr>
+    <tr><td>Cylindrical grinding</td><td>0.1 – 1.6</td><td>Shafts, precision bores, gear teeth</td></tr>
+    <tr><td>Milling / Turning</td><td>0.8 – 6.3</td><td>General machined surfaces</td></tr>
+    <tr><td>Die casting</td><td>0.8 – 2.0</td><td>As-cast aluminium/zinc parts</td></tr>
+    <tr><td>Injection moulding</td><td>0.4 – 1.6</td><td>Plastic parts (depends on mould polish grade)</td></tr>
+    <tr><td>Sand casting</td><td>6.3 – 25</td><td>As-cast rough surfaces only</td></tr></table>
+  </div>
+</div>
+<div class="qa-section-title">Interview Questions</div>
+<div class="qa-card" onclick="toggleQA(this)"><div class="qa-question"><span class="q-num">Q1</span><span class="q-text">What is hydrogen embrittlement in electroplating and how do you prevent it?</span><span class="q-toggle">+</span></div><div class="qa-answer"><div class="ans-text">During electroplating, atomic hydrogen is generated at the cathode (part surface) and diffuses into the metal lattice. In high-strength steels (&gt;1,000 MPa / ~32 HRC+), hydrogen trapped at grain boundaries causes a dramatic loss of ductility and toughness — the part becomes brittle and can fail at stresses far below yield strength, often hours to days after assembly (delayed failure). Prevention: <strong>bake parts at 190–220°C for 8–24 hours within 4 hours of plating</strong> to allow hydrogen to thermally diffuse out before it causes damage. This must be specified on the drawing as a requirement. For very high-strength steels (&gt;1,400 MPa), consider alternative processes: mechanical plating, ion vapour deposition (IVD) aluminium, or physical vapour deposition (PVD).</div></div></div>
+<div class="tags"><span class="tag">Anodize Type I/II/III</span><span class="tag orange">Powder Coating</span><span class="tag green">Electroplating</span><span class="tag">Ra / Rz Roughness</span><span class="tag purple">H₂ Embrittlement</span></div>
+</div>
+
+<!-- T13: DFMEA -->
+<div id="t13" class="topic-section">
+<div class="topic-header">
+  <div class="topic-tag">Topic 13 · Risk Analysis</div>
+  <div class="topic-title">DFMEA</div>
+  <div class="progress-bar"></div>
+</div>
+<div class="overview-card">
+  <div class="overview-badge">⚠️ Overview</div>
+  <div class="overview-title">Design Failure Mode &amp; Effects Analysis</div>
+  <div class="overview-text">DFMEA is a systematic proactive risk tool used during design to identify potential failure modes, assess their risk priority, and implement preventive actions before product release. Governed by <strong>AIAG-VDA FMEA Handbook (2019)</strong> — mandatory for automotive APQP. Risk is quantified by <strong>RPN = Severity × Occurrence × Detection</strong> (each 1–10, max RPN = 1,000). High RPN items get action plans. Critically, any item with <strong>Severity ≥ 9</strong> must be addressed regardless of RPN — because safety risks require mitigation even if occurrence and detection are favourable.</div>
+  <div class="overview-grid">
+    <div class="overview-grid-item"><div class="ogi-label">RPN Formula</div><div class="ogi-val">S × O × D (max 1,000)</div></div>
+    <div class="overview-grid-item"><div class="ogi-label">Action Threshold</div><div class="ogi-val">RPN ≥ 100 or Severity ≥ 9</div></div>
+    <div class="overview-grid-item"><div class="ogi-label">Standard</div><div class="ogi-val">AIAG-VDA 2019</div></div>
+    <div class="overview-grid-item"><div class="ogi-label">Timing</div><div class="ogi-val">Concept through design freeze</div></div>
+  </div>
+</div>
+<div class="subtopic">
+  <div class="subtopic-header"><div class="subtopic-icon blue">📋</div><div><div class="subtopic-title">DFMEA Column-by-Column Walkthrough</div><div class="subtopic-sub">Complete 11-step process guide</div></div></div>
+  <div class="subtopic-body">
+    <ul class="detail-list">
+      <li><strong>1. Item &amp; Function:</strong> Component and its required function. E.g. "Boss — locate and secure cover plate with M3 screw."</li>
+      <li><strong>2. Failure Mode:</strong> How the item fails to perform its function. E.g. "Boss fractures under assembly torque."</li>
+      <li><strong>3. Effect of Failure:</strong> Customer consequence. E.g. "Cover detaches in use — safety hazard, warranty return."</li>
+      <li><strong>4. Severity (S 1–10):</strong> S=10: safety failure without warning; S=9: safety with warning; S=7–8: major function loss; S=1: no noticeable effect.</li>
+      <li><strong>5. Cause of Failure:</strong> Root cause mechanism. E.g. "Boss wall too thin — stress concentration at base exceeds material limit."</li>
+      <li><strong>6. Occurrence (O 1–10):</strong> O=10: almost certain; O=1: almost impossible. Based on historical data or engineering judgement.</li>
+      <li><strong>7. Prevention Controls:</strong> Current design actions preventing the cause — design guidelines applied, FEA performed, design rules used.</li>
+      <li><strong>8. Detection (D 1–10):</strong> Ability to detect failure before reaching customer. D=1: definitely detected before release; D=10: undetectable.</li>
+      <li><strong>9. RPN = S × O × D:</strong> Prioritise action list from highest RPN downward.</li>
+      <li><strong>10. Recommended Actions:</strong> Assign owner + due date. Target Occurrence first (design change prevents root cause), then Detection (add test). Never reduce Severity by ignoring it.</li>
+      <li><strong>11. Revised RPN:</strong> Recalculate after actions are completed — confirms improvement achieved.</li>
+    </ul>
+    <div class="alert warning"><span class="alert-icon">⚠️</span> Severity ≥ 9 must ALWAYS be actioned regardless of RPN. S=9, O=1, D=1 = RPN 9 still requires a design change or protection measure.</div>
+  </div>
+</div>
+<div class="subtopic">
+  <div class="subtopic-header"><div class="subtopic-icon orange">🔄</div><div><div class="subtopic-title">DFMEA vs PFMEA</div><div class="subtopic-sub">Design failures vs manufacturing process failures</div></div></div>
+  <div class="subtopic-body">
+    <table class="info-table"><tr><th>Aspect</th><th>DFMEA</th><th>PFMEA</th></tr>
+    <tr><td>Scope</td><td>Product design — what is designed</td><td>Manufacturing process — how it is made</td></tr>
+    <tr><td>Owner</td><td>Design engineer</td><td>Manufacturing / process engineer</td></tr>
+    <tr><td>Timing</td><td>Concept through design freeze</td><td>Process planning through SOP</td></tr>
+    <tr><td>Example failure modes</td><td>Snap fit breaks, corrosion in field, clearance issue, thermal expansion problem</td><td>Wrong torque applied, component assembled backwards, weld undersize</td></tr>
+    <tr><td>Action types</td><td>Design change, material change, tighter tolerance, add DVT test</td><td>Poka-yoke, SPC, inspection point, operator training</td></tr></table>
+  </div>
+</div>
+<div class="qa-section-title">Interview Questions</div>
+<div class="qa-card" onclick="toggleQA(this)"><div class="qa-question"><span class="q-num">Q1</span><span class="q-text">Why is it wrong to only reduce Detection (D) when addressing a high RPN item?</span><span class="q-toggle">+</span></div><div class="qa-answer"><div class="ans-text">Reducing Detection means adding more inspection or testing to catch the failure before the customer — but the failure mode still exists in the product. You are now spending more resources to find and reject bad parts rather than preventing them. The correct priority is: <strong>first reduce Occurrence</strong> (change the design to eliminate the root cause — the failure no longer happens). Second priority: reduce Detection (add a test to catch it if it does happen). Only reduce Severity as a last resort (redesign to eliminate the hazardous effect entirely). Purely improving Detection without addressing Occurrence is not a robust solution — it is expensive, relies on inspection catching 100% of failures, and doesn't improve reliability in the field.</div></div></div>
+<div class="tags"><span class="tag">RPN = S×O×D</span><span class="tag orange">Severity ≥ 9 Rule</span><span class="tag green">AIAG-VDA 2019</span><span class="tag">PFMEA Difference</span><span class="tag purple">Occurrence First</span></div>
+</div>
+
+<!-- T14: ECO & ECR -->
+<div id="t14" class="topic-section">
+<div class="topic-header">
+  <div class="topic-tag">Topic 14 · Change Management</div>
+  <div class="topic-title">ECO &amp; ECR</div>
+  <div class="progress-bar"></div>
+</div>
+<div class="overview-card">
+  <div class="overview-badge">🔄 Overview</div>
+  <div class="overview-title">Engineering Change Management</div>
+  <div class="overview-text">Engineering change management ensures all modifications to a released design are systematically evaluated for technical merit, cost, schedule, and regulatory impact before implementation. Two key documents: <strong>ECR (Engineering Change Request)</strong> — a proposal not yet approved; <strong>ECO (Engineering Change Order)</strong> — a formal authorised instruction to implement. A <strong>Change Control Board (CCB)</strong> reviews ECRs and decides to approve, reject, or defer. Changes are tracked in a <strong>PDM/PLM system</strong> (Windchill, Teamcenter, Enovia) maintaining full revision history and BOM synchronisation.</div>
+  <div class="overview-grid">
+    <div class="overview-grid-item"><div class="ogi-label">ECR Status</div><div class="ogi-val">Proposal — awaiting approval</div></div>
+    <div class="overview-grid-item"><div class="ogi-label">ECO Status</div><div class="ogi-val">Authorised — must be implemented</div></div>
+    <div class="overview-grid-item"><div class="ogi-label">Review Board</div><div class="ogi-val">CCB (Change Control Board)</div></div>
+    <div class="overview-grid-item"><div class="ogi-label">System</div><div class="ogi-val">PLM / PDM (Windchill, Teamcenter)</div></div>
+  </div>
+</div>
+<div class="subtopic">
+  <div class="subtopic-header"><div class="subtopic-icon blue">📝</div><div><div class="subtopic-title">ECR vs ECO — Full Comparison</div><div class="subtopic-sub">What each document contains and who owns it</div></div></div>
+  <div class="subtopic-body">
+    <table class="info-table"><tr><th>Attribute</th><th>ECR (Request)</th><th>ECO (Order)</th></tr>
+    <tr><td>Status</td><td>Proposal — awaiting review and approval</td><td>Authorised — must be implemented</td></tr>
+    <tr><td>Initiator</td><td>Anyone: engineer, quality, customer, supplier, manufacturing</td><td>CCB or engineering authority</td></tr>
+    <tr><td>Contents</td><td>Problem description, proposed solution, urgency, requester details</td><td>Approved change description, affected part numbers, drawing revisions, BOM changes, effectivity date, stock disposition</td></tr>
+    <tr><td>Review</td><td>Yes — CCB evaluates technical merit, cost, schedule, risk</td><td>No — already approved; execution mandatory</td></tr>
+    <tr><td>Analogy</td><td>Purchase Requisition</td><td>Purchase Order</td></tr></table>
+    <div class="sec-heading">Common ECR Triggers</div>
+    <ul class="detail-list">
+      <li><strong>Field failures / customer complaints:</strong> Part failing in service — design change needed</li>
+      <li><strong>Cost reduction (VA/VE):</strong> Value analysis finding cheaper alternative material or process</li>
+      <li><strong>Regulatory compliance:</strong> New RoHS/REACH/safety standard requires material or design change</li>
+      <li><strong>Manufacturing issues:</strong> Production finding design impossible or difficult to make as specified</li>
+      <li><strong>Supplier change:</strong> Second source qualification requires design or spec verification</li>
+      <li><strong>Obsolescence:</strong> Component discontinued — need qualified alternative</li>
+    </ul>
+  </div>
+</div>
+<div class="subtopic">
+  <div class="subtopic-header"><div class="subtopic-icon orange">📅</div><div><div class="subtopic-title">Effectivity, Disposition &amp; Revision Control</div><div class="subtopic-sub">When changes take effect and what happens to existing stock</div></div></div>
+  <div class="subtopic-body">
+    <p><strong>Effectivity</strong> defines when the change becomes active in production:</p>
+    <ul class="detail-list">
+      <li><strong>Serial number effectivity:</strong> "Effective from Unit S/N 5000" — all units from this number onwards built to new design. Pre-SN5000 remain as-is.</li>
+      <li><strong>Date effectivity:</strong> "Effective 2025-03-01" — all parts produced after this date must meet new spec.</li>
+      <li><strong>Immediate:</strong> All WIP and new production implement now — typically for safety or quality stop-ship situations.</li>
+    </ul>
+    <p style="margin-top:10px;"><strong>Disposition</strong> tells you what to do with existing stock and WIP:</p>
+    <ul class="detail-list">
+      <li><strong>Use As-Is:</strong> Existing stock at old revision acceptable — use until exhausted. No rework needed.</li>
+      <li><strong>Rework:</strong> Modify existing parts to new specification. Rework traveller/instruction required.</li>
+      <li><strong>Return to Supplier:</strong> Vendor replaces at their cost.</li>
+      <li><strong>Scrap:</strong> Existing stock cannot be used — write off. MRB (Material Review Board) approval required.</li>
+    </ul>
+    <div class="alert info"><span class="alert-icon">💡</span> Every ECO requires a drawing revision update (A→B→C or 01→02→03). Revision block updated with change description, ECO number, date, and approver signature.</div>
+  </div>
+</div>
+<div class="qa-section-title">Interview Questions</div>
+<div class="qa-card" onclick="toggleQA(this)"><div class="qa-question"><span class="q-num">Q1</span><span class="q-text">What information must an ECO contain to be implementable?</span><span class="q-toggle">+</span></div><div class="qa-answer"><div class="key-points"><div class="key-points-title">Required ECO Contents</div><ul><li><strong>Change description:</strong> Precise technical description of what is changing and what it is changing to (from Rev A to Rev B)</li><li><strong>Affected documents:</strong> Drawing numbers, BOM part numbers, specifications, test procedures impacted</li><li><strong>Reason / justification:</strong> Why this change is needed — links back to originating ECR or field issue</li><li><strong>Effectivity:</strong> When the change takes effect — serial number, date, or immediate</li><li><strong>Disposition:</strong> What to do with existing inventory, WIP, and field stock at old revision</li><li><strong>Impact assessment:</strong> Cost impact, schedule impact, regulatory impact, tooling changes required</li><li><strong>Approvals:</strong> Design authority, quality, manufacturing, and customer (if contractually required) sign-offs</li></ul></div></div></div>
+<div class="tags"><span class="tag">ECR vs ECO</span><span class="tag orange">CCB Review</span><span class="tag green">Effectivity Types</span><span class="tag">Disposition</span><span class="tag purple">PLM / PDM</span></div>
+</div>
+
+<!-- T15: DFM/DFA/DFX -->
+<div id="t15" class="topic-section">
+<div class="topic-header">
+  <div class="topic-tag">Topic 15 · Design Methodology</div>
+  <div class="topic-title">DFM / DFA / DFX</div>
+  <div class="progress-bar"></div>
+</div>
+<div class="overview-card">
+  <div class="overview-badge">🛠 Overview</div>
+  <div class="overview-title">Design for X (DFX) — Concurrent Engineering</div>
+  <div class="overview-text">DFX is a family of concurrent engineering practices that optimise a design for specific downstream activities. Research by <strong>Boothroyd and Dewhurst</strong> showed 70–80% of manufacturing cost is committed at the design stage — making DFX the highest-leverage cost-reduction activity available to engineers. <strong>DFM</strong> (Design for Manufacturability) makes parts cheaper and easier to produce. <strong>DFA</strong> (Design for Assembly) reduces assembly time, cost, and error rate. Together they are called <strong>DFMA</strong>. Other variants address Reliability (DFR), Testability (DFT), Serviceability (DFS), Environment (DFE), and Six Sigma quality (DFSS).</div>
+  <div class="overview-grid">
+    <div class="overview-grid-item"><div class="ogi-label">Cost committed at design</div><div class="ogi-val">70 – 80%</div></div>
+    <div class="overview-grid-item"><div class="ogi-label">DFA key metric</div><div class="ogi-val">Min parts / Actual parts × 100%</div></div>
+    <div class="overview-grid-item"><div class="ogi-label">Founded by</div><div class="ogi-val">Boothroyd &amp; Dewhurst (1977)</div></div>
+    <div class="overview-grid-item"><div class="ogi-label">#1 saving target</div><div class="ogi-val">Part count reduction</div></div>
+  </div>
+</div>
+<div class="subtopic">
+  <div class="subtopic-header"><div class="subtopic-icon blue">⚙</div><div><div class="subtopic-title">DFM — Design for Manufacturability</div><div class="subtopic-sub">6 key principles that reduce manufacturing cost</div></div></div>
+  <div class="subtopic-body">
+    <ul class="detail-list">
+      <li><strong>Minimise part count:</strong> Combine multiple parts into one wherever function allows. Each eliminated part saves material, assembly time, inspection, inventory, and supply chain management cost.</li>
+      <li><strong>Standardise features:</strong> Use standard drill sizes (R10/R20 series), standard thread forms, standard gauge thicknesses — reduces tooling cost, setup time, and inspection equipment needs.</li>
+      <li><strong>Design to process capability:</strong> Never specify tolerances tighter than the process reliably achieves. Check process Cp/Cpk — Cp ≥ 1.33 (±4σ) typically required for production. Tighter tolerances = exponential cost increase.</li>
+      <li><strong>Avoid secondary operations:</strong> Design so no deburring, reaming, spot-facing, or hand finishing is required — each adds cost, time, and variation.</li>
+      <li><strong>Near-net-shape:</strong> Minimise material removed by machining. Design cast/moulded features in preference to machined pockets. Deep pocketing wastes material and machine time.</li>
+      <li><strong>Accessible features:</strong> All machined features reachable with standard tooling. Drill depth ≤ 3× diameter (deep holes need pecking cycles, high tool breakage risk). No blind-corner machining.</li>
+    </ul>
+  </div>
+</div>
+<div class="subtopic">
+  <div class="subtopic-header"><div class="subtopic-icon orange">🔧</div><div><div class="subtopic-title">DFA — Design for Assembly (Boothroyd-Dewhurst Method)</div><div class="subtopic-sub">Reduce assembly time, cost, and errors</div></div></div>
+  <div class="subtopic-body">
+    <div class="formula">DFA Efficiency = (Theoretical Minimum Part Count × 3 sec) / Actual Assembly Time × 100%</div>
+    <p>The Boothroyd-Dewhurst method assigns a time penalty to each handling and insertion operation. The DFA Efficiency Index drives redesign to reduce part count and simplify insertion.</p>
+    <ul class="detail-list">
+      <li><strong>Minimum part count test:</strong> For each part ask: (1) Does it move relative to other assembled parts? (2) Must it be a different material? (3) Must it be separate for access/service? If all NO → combine with adjacent part.</li>
+      <li><strong>One-direction assembly (Z-axis top-down):</strong> All parts inserted from the same direction — eliminates fixture re-orientation, enables automation.</li>
+      <li><strong>Self-locating / self-fastening:</strong> Snap fits, press fits, bayonet locks — integral features eliminate separate fasteners and reduce assembly steps.</li>
+      <li><strong>Error-proofing (Poka-yoke):</strong> Asymmetric geometry prevents wrong orientation — a D-shaft prevents rotational misassembly; a keyed connector prevents reverse insertion.</li>
+      <li><strong>Chamfers and lead-ins:</strong> Every insertion feature should have a chamfer, radius, or taper to guide the part to position without forcing.</li>
+      <li><strong>Easy handling:</strong> Parts should not tangle, nest, or require two-handed manipulation. Avoid flexible/limp parts (cable routing).</li>
+    </ul>
+  </div>
+</div>
+<div class="subtopic">
+  <div class="subtopic-header"><div class="subtopic-icon green">🌐</div><div><div class="subtopic-title">Other DFX Methodologies</div><div class="subtopic-sub">DFR · DFT · DFS · DFE · DFSS</div></div></div>
+  <div class="subtopic-body">
+    <table class="info-table"><tr><th>DFX</th><th>Focus</th><th>Key Activities</th></tr>
+    <tr><td><strong>DFR</strong> — Reliability</td><td>Prevent field failures over product life</td><td>DFMEA, component derating, HALT/HASS testing, redundancy, fatigue life analysis</td></tr>
+    <tr><td><strong>DFT</strong> — Testability</td><td>Enable efficient functional testing</td><td>Test points, access ports, built-in self-test (BIST), boundary scan (electronics)</td></tr>
+    <tr><td><strong>DFS</strong> — Serviceability</td><td>Easy repair, maintenance, and upgrade</td><td>Accessible wear parts, standard fasteners, modular sub-assemblies, clear service labels</td></tr>
+    <tr><td><strong>DFE</strong> — Environment</td><td>Reduce environmental impact, end-of-life</td><td>Material reduction, recyclable materials, disassembly ease, RoHS/REACH compliance</td></tr>
+    <tr><td><strong>DFSS</strong> — Six Sigma</td><td>Design quality in from inception</td><td>DMADV process, robust design (Taguchi), variation reduction, process capability targets</td></tr></table>
+  </div>
+</div>
+<div class="qa-section-title">Interview Questions</div>
+<div class="qa-card" onclick="toggleQA(this)"><div class="qa-question"><span class="q-num">Q1</span><span class="q-text">Give a real example of how DFM and DFA principles reduced cost in a product.</span><span class="q-toggle">+</span></div><div class="qa-answer"><div class="ans-text">A classic example: <strong>IBM Proprinter (1985)</strong> — Boothroyd and Dewhurst applied DFMA and reduced the part count from 152 to 32 parts (79% reduction). Assembly time dropped from 30 minutes to under 3 minutes. Key changes: snap fits replaced screws, moulded sub-frames combined multiple metal parts, symmetric parts eliminated orientation checking. The redesigned printer had fewer parts to fail, lower inventory, and was faster to assemble. In modern practice: redesigning a 5-part welded bracket assembly into a single die-cast part eliminates 4 assembly operations, 4 part numbers, welding inspection, and dimensional variation from 4 tolerance chains.</div></div></div>
+<div class="tags"><span class="tag">DFM Principles</span><span class="tag orange">DFA Boothroyd</span><span class="tag green">DFR Reliability</span><span class="tag">DFE Environment</span><span class="tag purple">DFSS / DMADV</span></div>
+</div>
+
+<!-- T16: ADDITIVE MFG -->
+<div id="t16" class="topic-section">
+<div class="topic-header">
+  <div class="topic-tag">Topic 16 · Advanced Manufacturing</div>
+  <div class="topic-title">Additive Manufacturing</div>
+  <div class="progress-bar"></div>
+</div>
+<div class="overview-card">
+  <div class="overview-badge">🖨 Overview</div>
+  <div class="overview-title">What is Additive Manufacturing?</div>
+  <div class="overview-text">Additive Manufacturing (AM) builds parts layer by layer directly from digital CAD files (STL/AMF format). Unlike subtractive machining (removes material) or formative casting (reshapes material), AM <strong>adds material only where needed</strong> — enabling internal channels, lattice structures, topology-optimised forms, and part consolidation impossible with traditional methods. AM spans desktop FDM printers ($200) to industrial metal DMLS systems ($2M+). Key standards: <strong>ISO/ASTM 52900</strong> (terminology), <strong>ASTM F3001</strong> (aerospace titanium AM parts).</div>
+  <div class="overview-grid">
+    <div class="overview-grid-item"><div class="ogi-label">Overhang rule</div><div class="ogi-val">Self-supporting ≤ 45° from vertical</div></div>
+    <div class="overview-grid-item"><div class="ogi-label">Weakest direction</div><div class="ogi-val">Z-axis (layer bond direction)</div></div>
+    <div class="overview-grid-item"><div class="ogi-label">DMLS accuracy</div><div class="ogi-val">±0.05–0.1 mm</div></div>
+    <div class="overview-grid-item"><div class="ogi-label">FDM min wall</div><div class="ogi-val">1.5 mm (2× nozzle dia.)</div></div>
+  </div>
+</div>
+<div class="subtopic">
+  <div class="subtopic-header"><div class="subtopic-icon blue">🔵</div><div><div class="subtopic-title">AM Process Technologies</div><div class="subtopic-sub">FDM · SLA · SLS · DMLS · MJF — how each works and when to use</div></div></div>
+  <div class="subtopic-body">
+    <table class="info-table"><tr><th>Process</th><th>How It Works</th><th>Accuracy</th><th>Best Materials</th><th>Best For</th></tr>
+    <tr><td><strong>FDM/FFF</strong></td><td>Extrudes melted filament layer by layer</td><td>±0.3–0.5 mm</td><td>PLA, ABS, PETG, PA, TPU</td><td>Concept models, low-cost rapid prototyping, jigs/fixtures</td></tr>
+    <tr><td><strong>SLA/DLP</strong></td><td>UV laser/projector cures photopolymer resin</td><td>±0.1–0.2 mm</td><td>Engineering resins, dental, castable wax</td><td>High-detail parts, dental/medical, investment casting patterns</td></tr>
+    <tr><td><strong>SLS</strong></td><td>Laser sinters nylon powder; unused powder = support</td><td>±0.2–0.3 mm</td><td>PA12, PA11, TPU, PP</td><td>Functional prototypes, small production runs, no supports needed</td></tr>
+    <tr><td><strong>DMLS/SLM</strong></td><td>High-power laser fuses metal powder in inert atmosphere</td><td>±0.05–0.1 mm</td><td>SS 316L, Ti-6Al-4V, Al Si10Mg, Inconel, CoCr</td><td>Aerospace, medical implants, conformal-cooled tooling inserts</td></tr>
+    <tr><td><strong>MJF</strong></td><td>HP process: inkjet fusing and detailing agents on powder</td><td>±0.2–0.3 mm</td><td>PA12, PA11, PA12-GF</td><td>Medium-volume production, isotropic properties, no supports</td></tr></table>
+  </div>
+</div>
+<div class="subtopic">
+  <div class="subtopic-header"><div class="subtopic-icon orange">📐</div><div><div class="subtopic-title">Design for Additive Manufacturing (DfAM)</div><div class="subtopic-sub">Rules specific to layer-by-layer construction</div></div></div>
+  <div class="subtopic-body">
+    <ul class="detail-list">
+      <li><strong>45° overhang rule:</strong> Surfaces overhanging more than 45° from vertical require support structures. Design self-supporting geometry wherever possible to reduce support removal effort and surface damage.</li>
+      <li><strong>Z-axis is weakest:</strong> Tensile strength perpendicular to layers is 20–50% lower than in-plane for FDM. Orient critical load paths parallel to the build plane.</li>
+      <li><strong>Horizontal holes print oval:</strong> Due to layer stacking, horizontal bores print slightly undersized and oval. For precision bores, print undersized and drill/ream to final size.</li>
+      <li><strong>Minimum walls:</strong> FDM: 1.5 mm; SLA: 0.5 mm; SLS: 0.7 mm; DMLS: 0.4 mm. Below minimum = incomplete fill or collapse.</li>
+      <li><strong>Topology optimisation:</strong> Use AM freedom to remove low-stress material — create organic load-following shapes impossible with machining. Tools: Altair OptiStruct, nTopology, Fusion 360 Generative Design.</li>
+      <li><strong>Part consolidation:</strong> AM's biggest DFX advantage — merge multi-part assemblies into a single printed component, eliminating assembly, fasteners, and tolerance chains.</li>
+      <li><strong>Conformal cooling (DMLS):</strong> Print mould inserts with cooling channels that follow the cavity surface — dramatically improves injection moulding cycle time and part quality vs straight-drilled channels.</li>
+    </ul>
+  </div>
+</div>
+<div class="qa-section-title">Interview Questions</div>
+<div class="qa-card" onclick="toggleQA(this)"><div class="qa-question"><span class="q-num">Q1</span><span class="q-text">When would you choose AM over traditional manufacturing?</span><span class="q-toggle">+</span></div><div class="qa-answer"><table class="info-table"><tr><th>Prefer AM When</th><th>Prefer Traditional When</th></tr><tr><td>Prototyping — fast, no tooling, 1–100 parts</td><td>High volume &gt;10,000 parts — unit cost dominates</td></tr><tr><td>Highly complex internal geometry (channels, lattice)</td><td>Tight tolerances ±0.01 mm range needed</td></tr><tr><td>Part consolidation eliminates assembly cost</td><td>Surface finish critical Ra &lt; 0.8 µm</td></tr><tr><td>Customisation per unit (implants, hearing aids)</td><td>Fully isotropic material properties required</td></tr><tr><td>No tooling budget or lead time available</td><td>Cost per part critical at high volume</td></tr></table></div></div>
+<div class="tags"><span class="tag">FDM / SLA / SLS</span><span class="tag orange">DMLS / SLM Metal</span><span class="tag green">DfAM Rules</span><span class="tag">Topology Optimisation</span><span class="tag purple">Part Consolidation</span></div>
+</div>
+
+<!-- T17: FEA -->
+<div id="t17" class="topic-section">
+<div class="topic-header">
+  <div class="topic-tag">Topic 17 · Simulation &amp; Analysis</div>
+  <div class="topic-title">FEA Basics</div>
+  <div class="progress-bar"></div>
+</div>
+<div class="overview-card">
+  <div class="overview-badge">💻 Overview</div>
+  <div class="overview-title">Finite Element Analysis — What It Is &amp; Why It Matters</div>
+  <div class="overview-text">FEA divides a complex structure into thousands of small, simple elements (tetrahedra, hexahedra, shells, beams). The behaviour of each element is described by simple mathematical functions; the entire structure is assembled by connecting elements at shared nodes. FEA solves <strong>[K]{u} = {F}</strong> — where [K] is the global stiffness matrix, {u} is nodal displacements, and {F} is applied force. From displacements, strains and stresses are derived. Commercial codes: <strong>ANSYS, Abaqus, MSC Nastran, COMSOL, Altair OptiStruct</strong>. FEA does not replace hand calculations — both must agree within ~20% or the model has an error.</div>
+  <div class="overview-grid">
+    <div class="overview-grid-item"><div class="ogi-label">Core Equation</div><div class="ogi-val">[K]{u} = {F}</div></div>
+    <div class="overview-grid-item"><div class="ogi-label">Convergence Criterion</div><div class="ogi-val">&lt;5% change on mesh refinement</div></div>
+    <div class="overview-grid-item"><div class="ogi-label">Yield criterion (metals)</div><div class="ogi-val">von Mises stress</div></div>
+    <div class="overview-grid-item"><div class="ogi-label">Typical FoS range</div><div class="ogi-val">1.25 – 5.0 (application dependent)</div></div>
+  </div>
+</div>
+<div class="subtopic">
+  <div class="subtopic-header"><div class="subtopic-icon blue">🔢</div><div><div class="subtopic-title">FEA Workflow — 5 Steps</div><div class="subtopic-sub">Pre-process → Boundary Conditions → Solve → Post-process → Validate</div></div></div>
+  <div class="subtopic-body">
+    <ul class="detail-list">
+      <li><strong>Step 1 — Pre-processing:</strong> Import and simplify CAD geometry (remove threads, small chamfers, fillets unless stress-critical). Assign material properties (E, ν, ρ, yield strength). Mesh: choose element type, set element size, refine at stress concentrations. Check mesh quality: aspect ratio &lt;5, skewness &lt;0.85.</li>
+      <li><strong>Step 2 — Boundary Conditions &amp; Loads:</strong> Apply fixtures (fixed supports, symmetry planes, rollers) to replicate real-world constraints. Apply loads (forces, pressures, moments, temperatures). Rule: always use the most realistic BCs. Over-constrained models underestimate stress; under-constrained models give rigid-body motion errors.</li>
+      <li><strong>Step 3 — Solve:</strong> FEA assembles [K] from all element stiffness matrices and solves {u} = [K]⁻¹{F}. Linear static: fast. Nonlinear (large deformation, contact, plasticity): iterative solver, computationally intensive.</li>
+      <li><strong>Step 4 — Post-processing:</strong> Extract von Mises stress (ductile metals), principal stresses (brittle materials), displacement, reaction forces. Identify hot spots. Calculate FoS = σ_yield / σ_von_Mises.</li>
+      <li><strong>Step 5 — Validation:</strong> Compare to hand calculations (beam theory, Hertz contact). If FEA and hand calc disagree &gt;20%, investigate — wrong BCs, mesh issue, or modelling error. Perform mesh convergence study.</li>
+    </ul>
+  </div>
+</div>
+<div class="subtopic">
+  <div class="subtopic-header"><div class="subtopic-icon orange">🔲</div><div><div class="subtopic-title">Element Types &amp; Meshing Guidance</div><div class="subtopic-sub">Choosing the right element for the geometry and physics</div></div></div>
+  <div class="subtopic-body">
+    <table class="info-table"><tr><th>Element</th><th>Shape</th><th>Best For</th><th>Key Note</th></tr>
+    <tr><td><strong>Tet4 / Tet10</strong></td><td>4 or 10-node tetrahedron</td><td>Complex 3D solids — auto-meshable for any geometry</td><td>Always use Tet10 (quadratic) for accuracy — Tet4 (linear) is too stiff</td></tr>
+    <tr><td><strong>Hex8 / Hex20</strong></td><td>8–20 node brick</td><td>Regular geometry — bending, thick solid sections</td><td>More accurate per DOF than tets; requires structured meshing effort</td></tr>
+    <tr><td><strong>Shell (Quad4 / Tri3)</strong></td><td>2D surface + assigned thickness</td><td>Thin-walled structures: sheet metal, plastic shells, pressure vessels</td><td>Cannot capture through-thickness stress variation</td></tr>
+    <tr><td><strong>Beam (1D)</strong></td><td>Line + cross-section properties</td><td>Structural frames, trusses, thin shafts</td><td>Very efficient; cross-section defined by area properties, not geometry</td></tr></table>
+  </div>
+</div>
+<div class="subtopic">
+  <div class="subtopic-header"><div class="subtopic-icon green">📊</div><div><div class="subtopic-title">von Mises Stress &amp; Factor of Safety</div><div class="subtopic-sub">Yield criteria and safe design thresholds</div></div></div>
+  <div class="subtopic-body">
+    <p>Von Mises stress reduces a complex 3D stress state to a single equivalent scalar for comparison with uniaxial tensile yield strength. Best yield criterion for isotropic ductile metals (steel, aluminium, titanium).</p>
+    <div class="formula">σ_VM = √[ ½ × ((σ₁−σ₂)² + (σ₂−σ₃)² + (σ₃−σ₁)²) ]
+Yields when σ_VM ≥ σ_yield
+Factor of Safety (FoS) = σ_yield / σ_VM_max</div>
+    <table class="info-table"><tr><th>Context</th><th>Typical FoS</th><th>Reasoning</th></tr>
+    <tr><td>Well-defined loads, aerospace (weight critical)</td><td>1.25 – 1.5</td><td>Loads well characterised, high analysis confidence</td></tr>
+    <tr><td>General mechanical design</td><td>2.0 – 2.5</td><td>Some load uncertainty, moderate failure consequence</td></tr>
+    <tr><td>Impact loads, human safety, unknown loads</td><td>3.0 – 5.0</td><td>High uncertainty, severe failure consequence</td></tr>
+    <tr><td>Brittle materials (ceramics, cast iron)</td><td>4.0 – 8.0</td><td>No plastic redistribution, sudden fracture mode</td></tr></table>
+  </div>
+</div>
+<div class="subtopic">
+  <div class="subtopic-header"><div class="subtopic-icon purple">🎵</div><div><div class="subtopic-title">Types of FEA Analysis</div><div class="subtopic-sub">Static, Modal, Fatigue, Thermal, Nonlinear — when to use each</div></div></div>
+  <div class="subtopic-body">
+    <table class="info-table"><tr><th>Analysis Type</th><th>Solves For</th><th>Typical Use Case</th></tr>
+    <tr><td><strong>Linear Static</strong></td><td>Stress &amp; displacement, constant load, small deformation</td><td>Most common — bracket under force, bolted joint, pressure vessel</td></tr>
+    <tr><td><strong>Nonlinear Static</strong></td><td>Large deformation, plasticity, contact, hyperelastic</td><td>Snap fits, rubber seals, sheet metal forming, crash</td></tr>
+    <tr><td><strong>Modal (Normal Modes)</strong></td><td>Natural frequencies and mode shapes</td><td>Confirm no resonance with operating frequency — speakers, motors, pumps</td></tr>
+    <tr><td><strong>Harmonic Response</strong></td><td>Steady-state response to sinusoidal loading vs frequency</td><td>NVH, vibration isolation system design, amplification at resonance</td></tr>
+    <tr><td><strong>Transient / Explicit</strong></td><td>Response vs time under time-varying or impact load</td><td>Drop test, crash, blast, shock, hammerblow</td></tr>
+    <tr><td><strong>Thermal</strong></td><td>Temperature distribution and heat flux</td><td>PCB thermal management, heat sink design, engine components</td></tr>
+    <tr><td><strong>Fatigue</strong></td><td>Cycles to failure under cyclic stress (S-N or strain-life)</td><td>Rotating shafts, springs, vehicle chassis, pressure cycling</td></tr></table>
+  </div>
+</div>
+<div class="qa-section-title">Interview Questions</div>
+<div class="qa-card" onclick="toggleQA(this)"><div class="qa-question"><span class="q-num">Q1</span><span class="q-text">What is mesh convergence and why is it mandatory in any FEA study?</span><span class="q-toggle">+</span></div><div class="qa-answer"><div class="ans-text"><strong>Mesh convergence</strong> is the process of progressively refining the mesh and monitoring whether the result (typically peak von Mises stress or max displacement) stabilises to a fixed value. A coarse mesh is too stiff — it underestimates stress, giving a non-conservative result that could lead to undersized components failing in service. As mesh is refined, the solution approaches the mathematically exact answer. Convergence is declared when results change &lt;5% between successive mesh refinements (e.g., halving element size). Without this study, there is no engineering basis for trusting the FEA results.</div><div class="alert tip"><span class="alert-icon">✅</span> Refine mesh locally at stress concentrations (fillets, holes) rather than globally — saves computation time while capturing accurate peak stresses where they matter most.</div></div></div>
+<div class="qa-card" onclick="toggleQA(this)"><div class="qa-question"><span class="q-num">Q2</span><span class="q-text">What is the difference between linear and nonlinear FEA?</span><span class="q-toggle">+</span></div><div class="qa-answer"><table class="info-table"><tr><th>Aspect</th><th>Linear FEA</th><th>Nonlinear FEA</th></tr><tr><td>Deformation</td><td>Small — geometry doesn't change during solve</td><td>Large — geometry updates each iteration</td></tr><tr><td>Material</td><td>Linear elastic only (Hooke's Law)</td><td>Plastic, hyperelastic (rubber), viscoelastic</td></tr><tr><td>Contact</td><td>Bonded (no separation allowed)</td><td>Real contact/separation/sliding with friction</td></tr><tr><td>Computation</td><td>Single matrix solve — seconds to minutes</td><td>Iterative Newton-Raphson — hours potentially</td></tr><tr><td>Use when</td><td>Stress well below yield; small deflections</td><td>Expected plastic deformation; large deflection; snap fits; rubber seals</td></tr></table></div></div>
+<div class="tags"><span class="tag">von Mises Stress</span><span class="tag orange">Mesh Convergence</span><span class="tag orange">FoS</span><span class="tag green">Modal Analysis</span><span class="tag">[K]{u}={F}</span><span class="tag purple">Nonlinear FEA</span></div>
+</div>
+
+</div><!-- end mainContent -->
+</div><!-- end body-wrapper -->
+
+<script>
+function toggleSidebar(){
+  var sb=document.getElementById('sidebar');
+  var ham=document.getElementById('hamburger');
+  var ov=document.getElementById('overlay');
+  if(sb.classList.contains('open')){
+    sb.classList.remove('open');ham.classList.remove('open');ov.classList.remove('visible');
+  }else{
+    sb.classList.add('open');ham.classList.add('open');ov.classList.add('visible');
+  }
+}
+function closeSidebar(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('hamburger').classList.remove('open');
+  document.getElementById('overlay').classList.remove('visible');
+}
+function showTopic(id,label){
+  document.querySelectorAll('.topic-section').forEach(function(s){s.classList.remove('active');});
+  var sec=document.getElementById(id);
+  if(sec)sec.classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('active');});
+  event.currentTarget.classList.add('active');
+  document.getElementById('currentPill').textContent=label;
+  document.getElementById('mainContent').scrollTop=0;
+  closeSidebar();
+}
+function toggleQA(card){card.classList.toggle('open');}
+function filterNav(val){
+  var v=val.toLowerCase().trim();
+  document.querySelectorAll('#navList .nav-item').forEach(function(item){
+    var n=item.getAttribute('data-name')||'';
+    var l=item.querySelector('.nav-label').textContent.toLowerCase();
+    item.style.display=(n.indexOf(v)>=0||l.indexOf(v)>=0)?'':'none';
+  });
+}
+window.addEventListener('DOMContentLoaded',function(){
+  var first=document.querySelector('#t1 .qa-card');
+  if(first)first.classList.add('open');
+});
+</script>
+</body>
+</html>
