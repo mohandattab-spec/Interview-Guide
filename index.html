@@ -1,0 +1,1549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Engineering Interview Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Nunito:wght@400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --surface: #111827;
+    --card: #1a2235;
+    --border: #1e3a5f;
+    --accent: #00d4ff;
+    --accent2: #ff6b35;
+    --accent3: #39ff14;
+    --text: #e2e8f0;
+    --muted: #b0bdd0;
+    --heading: #ffffff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  /* ── TOP BAR ── */
+  .topbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #0d1b2e;
+    border-bottom: 2px solid var(--accent);
+    padding: 0 16px;
+    height: 56px;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 200;
+    box-shadow: 0 2px 20px rgba(0,212,255,0.15);
+  }
+  .hamburger {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 8px;
+    flex-shrink: 0;
+    transition: background 0.2s;
+  }
+  .hamburger:hover { background: rgba(0,212,255,0.1); }
+  .hamburger span {
+    display: block;
+    height: 2.5px;
+    background: var(--accent);
+    border-radius: 3px;
+    transition: all 0.3s;
+    transform-origin: center;
+  }
+  .hamburger.open span:nth-child(1) { transform: translateY(7.5px) rotate(45deg); }
+  .hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+  .hamburger.open span:nth-child(3) { transform: translateY(-7.5px) rotate(-45deg); }
+
+  .topbar-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 1.5px;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .current-topic-pill {
+    background: rgba(0,212,255,0.1);
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-family: 'Share Tech Mono', monospace;
+    white-space: nowrap;
+    max-width: 130px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* ── BODY WRAPPER ── */
+  .body-wrapper {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* ── OVERLAY ── */
+  .overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    top: 56px;
+    background: rgba(0,0,0,0.7);
+    z-index: 150;
+  }
+  .overlay.visible { display: block; }
+
+  /* ── SIDEBAR DRAWER ── */
+  .sidebar {
+    position: fixed;
+    top: 56px;
+    left: 0;
+    bottom: 0;
+    width: 280px;
+    background: #0d1520;
+    border-right: 2px solid var(--accent);
+    z-index: 160;
+    display: flex;
+    flex-direction: column;
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+    box-shadow: 4px 0 30px rgba(0,0,0,0.5);
+  }
+  .sidebar.open { transform: translateX(0); }
+
+  .sidebar-header {
+    padding: 14px 16px 10px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .sidebar-header-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.9rem;
+    color: var(--accent2);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .sidebar-search input {
+    width: 100%;
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.85rem;
+    outline: none;
+  }
+  .sidebar-search input:focus { border-color: var(--accent); }
+
+  .nav-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px 0 20px;
+  }
+  .nav-list::-webkit-scrollbar { width: 4px; }
+  .nav-list::-webkit-scrollbar-track { background: transparent; }
+  .nav-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 16px;
+    cursor: pointer;
+    border-left: 3px solid transparent;
+    transition: all 0.2s;
+    user-select: none;
+  }
+  .nav-item:hover { background: rgba(0,212,255,0.06); border-left-color: var(--border); }
+  .nav-item.active {
+    background: rgba(0,212,255,0.1);
+    border-left-color: var(--accent);
+  }
+  .nav-num {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.8rem;
+    background: rgba(0,212,255,0.08);
+    color: var(--accent);
+    border: 1px solid rgba(0,212,255,0.2);
+    padding: 2px 6px;
+    border-radius: 5px;
+    min-width: 30px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+  .nav-item.active .nav-num {
+    background: var(--accent);
+    color: var(--bg);
+    border-color: var(--accent);
+  }
+  .nav-label {
+    font-size: 0.95rem;
+    color: var(--muted);
+    font-weight: 600;
+    line-height: 1.3;
+  }
+  .nav-item.active .nav-label { color: var(--accent); }
+  .nav-item:hover .nav-label { color: var(--text); }
+
+  /* ── MAIN CONTENT ── */
+  .main {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 16px 40px;
+    height: 100%;
+  }
+  .main::-webkit-scrollbar { width: 5px; }
+  .main::-webkit-scrollbar-track { background: var(--surface); }
+  .main::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  /* ── TOPIC SECTIONS ── */
+  .topic-section { display: none; }
+  .topic-section.active { display: block; animation: fadeIn 0.25s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  .topic-header {
+    margin-bottom: 20px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .topic-tag {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--accent2);
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    margin-bottom: 5px;
+  }
+  .topic-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1.9rem;
+    font-weight: 700;
+    color: var(--heading);
+    line-height: 1.1;
+  }
+  .topic-desc {
+    color: var(--muted);
+    font-size: 0.95rem;
+    margin-top: 8px;
+    line-height: 1.6;
+  }
+  .progress-bar {
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 2px;
+    margin-top: 10px;
+  }
+
+  /* ── DIAGRAM BOX ── */
+  .diagram-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+    margin: 16px 0;
+    overflow-x: auto;
+  }
+  .diagram-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.9rem;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+  }
+  .diagram-title::before { content: '⬡ '; }
+
+  /* ── Q&A CARDS ── */
+  .qa-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 12px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .qa-card:hover { border-color: #2a5a8f; }
+  .qa-question {
+    padding: 14px 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .q-num {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.82rem;
+    color: var(--accent);
+    background: rgba(0,212,255,0.08);
+    border: 1px solid rgba(0,212,255,0.25);
+    padding: 2px 7px;
+    border-radius: 5px;
+    min-width: 38px;
+    text-align: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .q-text {
+    font-weight: 700;
+    font-size: 0.98rem;
+    color: var(--heading);
+    line-height: 1.45;
+    flex: 1;
+  }
+  .q-toggle {
+    font-size: 1.4rem;
+    color: var(--accent);
+    flex-shrink: 0;
+    transition: transform 0.3s;
+    line-height: 1;
+    margin-top: 0;
+  }
+  .qa-card.open .q-toggle { transform: rotate(45deg); }
+  .qa-answer {
+    display: none;
+    padding: 14px 16px;
+    border-top: 1px solid var(--border);
+  }
+  .qa-card.open .qa-answer { display: block; }
+  .ans-text { font-size: 0.95rem; line-height: 1.75; color: var(--text); }
+  .ans-text strong { color: var(--accent); }
+  .ans-text em { color: var(--accent2); font-style: normal; font-weight: 600; }
+
+  /* Key Points */
+  .key-points {
+    background: rgba(0,212,255,0.04);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 8px 8px 0;
+    padding: 10px 14px;
+    margin-top: 10px;
+  }
+  .key-points-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.88rem;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 7px;
+  }
+  .key-points ul { padding-left: 16px; }
+  .key-points li { font-size: 0.92rem; line-height: 1.7; margin-bottom: 3px; }
+  .key-points li::marker { color: var(--accent); }
+  .key-points li strong { color: var(--accent); }
+
+  /* Table */
+  .info-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9rem; overflow-x: auto; display: block; }
+  .info-table th { background: rgba(0,212,255,0.08); color: var(--accent); padding: 8px 11px; text-align: left; font-family: 'Rajdhani', sans-serif; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; border: 1px solid var(--border); white-space: nowrap; }
+  .info-table td { padding: 8px 11px; border: 1px solid var(--border); color: var(--text); vertical-align: top; }
+  .info-table tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+
+  /* Alert / Tip */
+  .alert { border-radius: 7px; padding: 10px 13px; margin-top: 10px; font-size: 0.92rem; line-height: 1.6; }
+  .alert.tip { background: rgba(57,255,20,0.05); border: 1px solid rgba(57,255,20,0.2); color: #b8ffb0; }
+  .alert.warning { background: rgba(255,107,53,0.06); border: 1px solid rgba(255,107,53,0.2); color: #ffc4a8; }
+  .alert.info { background: rgba(0,212,255,0.05); border: 1px solid rgba(0,212,255,0.2); color: #a8e8ff; }
+
+  /* Formula */
+  .formula { background: #060e1c; border: 1px solid var(--accent); border-radius: 7px; padding: 10px 14px; margin: 10px 0; font-family: 'Share Tech Mono', monospace; font-size: 0.92rem; color: var(--accent3); text-align: center; white-space: pre-wrap; word-break: break-word; }
+
+  /* Tags */
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
+  .tag { background: rgba(0,212,255,0.06); border: 1px solid rgba(0,212,255,0.2); color: var(--accent); padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-family: 'Share Tech Mono', monospace; }
+  .tag.orange { color: var(--accent2); border-color: rgba(255,107,53,0.3); background: rgba(255,107,53,0.06); }
+  .tag.green { color: var(--accent3); border-color: rgba(57,255,20,0.3); background: rgba(57,255,20,0.04); }
+
+  /* SVG */
+  svg text { font-family: 'Share Tech Mono', monospace; }
+</style>
+</head>
+<body>
+
+<!-- ═══ TOP BAR ═══ -->
+<div class="topbar">
+  <div class="hamburger" id="hamburger" onclick="toggleSidebar()">
+    <span></span><span></span><span></span>
+  </div>
+  <div class="topbar-title">⚙ Engineering Interview Guide</div>
+  <div class="current-topic-pill" id="currentPill">GD&T</div>
+</div>
+
+<!-- ═══ BODY ═══ -->
+<div class="body-wrapper">
+  <!-- Overlay -->
+  <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+  <!-- ═══ SIDEBAR DRAWER ═══ -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-header-title">📚 Select Topic</div>
+      <div class="sidebar-search">
+        <input type="text" id="searchInput" placeholder="🔍 Search topics..." oninput="filterNav(this.value)">
+      </div>
+    </div>
+    <div class="nav-list" id="navList">
+      <div class="nav-item active" onclick="showTopic('t1','GD&T')" data-name="gdt geometric dimensioning tolerancing">
+        <span class="nav-num">01</span><span class="nav-label">GD&T</span>
+      </div>
+      <div class="nav-item" onclick="showTopic('t2','Sheet Metal Design')" data-name="sheet metal design bend k-factor">
+        <span class="nav-num">02</span><span class="nav-label">Sheet Metal Design</span>
+      </div>
+      <div class="nav-item" onclick="showTopic('t3','Sheet Metal Mfg.')" data-name="sheet metal manufacturing process blanking piercing deep drawing">
+        <span class="nav-num">03</span><span class="nav-label">Sheet Metal Mfg.</span>
+      </div>
+      <div class="nav-item" onclick="showTopic('t4','Casting Design')" data-name="casting parts design draft parting line undercut">
+        <span class="nav-num">04</span><span class="nav-label">Casting Design</span>
+      </div>
+      <div class="nav-item" onclick="showTopic('t5','Casting Mfg.')" data-name="casting manufacturing process sand die investment centrifugal">
+        <span class="nav-num">05</span><span class="nav-label">Casting Mfg.</span>
+      </div>
+      <div class="nav-item" onclick="showTopic('t6','Plastic Design')" data-name="plastic design boss rib snap fit living hinge wall thickness">
+        <span class="nav-num">06</span><span class="nav-label">Plastic Design</span>
+      </div>
+      <div class="nav-item" onclick="showTopic('t7','Injection Moulding')" data-name="injection moulding basics cycle gate runner">
+        <span class="nav-num">07</span><span class="nav-label">Injection Moulding</span>
+      </div>
+      <div class="nav-item" onclick="showTopic('t8','Moulding Defects')" data-name="plastic failure errors moulding defects sink warpage flash short shot">
+        <span class="nav-num">08</span><span class="nav-label">Moulding Defects</span>
+      </div>
+      <div class="nav-item" onclick="showTopic('t9','Tolerance Stackup')" data-name="tolerance stackup analysis worst case rss">
+        <span class="nav-num">09</span><span class="nav-label">Tolerance Stackup</span>
+      </div>
+      <div class="nav-item" onclick="showTopic('t10','Projects')" data-name="projects design engineering star method">
+        <span class="nav-num">10</span><span class="nav-label">Projects</span>
+      </div>
+      <div class="nav-item" onclick="showTopic('t11','Basic Materials')" data-name="basic materials steel aluminum plastic ashby">
+        <span class="nav-num">11</span><span class="nav-label">Basic Materials</span>
+      </div>
+      <div class="nav-item" onclick="showTopic('t12','Finishing Processes')" data-name="finishing process methods anodizing powder coating surface roughness">
+        <span class="nav-num">12</span><span class="nav-label">Finishing Processes</span>
+      </div>
+      <div class="nav-item" onclick="showTopic('t13','DFMEA')" data-name="dfmea design failure mode effects analysis rpn severity">
+        <span class="nav-num">13</span><span class="nav-label">DFMEA</span>
+      </div>
+      <div class="nav-item" onclick="showTopic('t14','ECO & ECR')" data-name="eco ecr engineering change order request">
+        <span class="nav-num">14</span><span class="nav-label">ECO &amp; ECR</span>
+      </div>
+      <div class="nav-item" onclick="showTopic('t15','DFM / DFA / DFX')" data-name="dfm dfa dfx design for manufacturing assembly">
+        <span class="nav-num">15</span><span class="nav-label">DFM / DFA / DFX</span>
+      </div>
+      <div class="nav-item" onclick="showTopic('t16','Additive Mfg.')" data-name="additive manufacturing 3d printing fdm sla sls dmls">
+        <span class="nav-num">16</span><span class="nav-label">Additive Mfg.</span>
+      </div>
+      <div class="nav-item" onclick="showTopic('t17','FEA Basics')" data-name="fea finite element analysis basics von mises meshing">
+        <span class="nav-num">17</span><span class="nav-label">FEA Basics</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ MAIN CONTENT ═══ -->
+  <div class="main" id="mainContent">
+
+    <!-- ══ T1: GD&T ══ -->
+    <div id="t1" class="topic-section active">
+      <div class="topic-header">
+        <div class="topic-tag">Topic 01 · Dimensioning & Tolerancing</div>
+        <div class="topic-title">GD&T</div>
+        <div class="topic-desc">Geometric Dimensioning & Tolerancing is a symbolic language on engineering drawings defining allowable variation in form, orientation, location, and runout of part features.</div>
+        <div class="progress-bar"></div>
+      </div>
+      <div class="diagram-box">
+        <div class="diagram-title">GD&T Symbol Categories</div>
+        <svg width="100%" viewBox="0 0 700 260" style="max-width:700px;display:block;margin:auto">
+          <rect width="700" height="260" fill="#0a1628" rx="10"/>
+          <rect x="10" y="10" width="155" height="240" rx="8" fill="#0d2137" stroke="#1e3a5f" stroke-width="1.5"/>
+          <text x="87" y="32" fill="#00d4ff" font-size="14" text-anchor="middle" font-weight="bold">FORM</text>
+          <line x1="20" y1="38" x2="155" y2="38" stroke="#1e3a5f" stroke-width="1"/>
+          <text x="24" y="58" fill="#e2e8f0" font-size="13">⎯  Straightness</text>
+          <text x="24" y="80" fill="#e2e8f0" font-size="13">⏥  Flatness</text>
+          <text x="24" y="102" fill="#e2e8f0" font-size="13">○  Circularity</text>
+          <text x="24" y="124" fill="#e2e8f0" font-size="13">⌀  Cylindricity</text>
+          <rect x="20" y="140" width="136" height="20" rx="4" fill="rgba(57,255,20,0.08)" stroke="rgba(57,255,20,0.3)" stroke-width="1"/>
+          <text x="88" y="154" fill="#39ff14" font-size="12" text-anchor="middle">No Datum Required</text>
+          <text x="24" y="180" fill="#b0bdd0" font-size="14">Controls shape of</text>
+          <text x="24" y="193" fill="#b0bdd0" font-size="14">a single feature.</text>
+          <text x="24" y="210" fill="#b0bdd0" font-size="14">Independent of</text>
+          <text x="24" y="223" fill="#b0bdd0" font-size="14">any reference.</text>
+
+          <rect x="175" y="10" width="155" height="240" rx="8" fill="#0d2137" stroke="#1e3a5f" stroke-width="1.5"/>
+          <text x="252" y="32" fill="#00d4ff" font-size="14" text-anchor="middle" font-weight="bold">ORIENTATION</text>
+          <line x1="185" y1="38" x2="320" y2="38" stroke="#1e3a5f" stroke-width="1"/>
+          <text x="189" y="58" fill="#e2e8f0" font-size="13">∥  Parallelism</text>
+          <text x="189" y="80" fill="#e2e8f0" font-size="13">⊥  Perpendicularity</text>
+          <text x="189" y="102" fill="#e2e8f0" font-size="13">∠  Angularity</text>
+          <rect x="185" y="118" width="136" height="20" rx="4" fill="rgba(255,107,53,0.08)" stroke="rgba(255,107,53,0.3)" stroke-width="1"/>
+          <text x="253" y="132" fill="#ff6b35" font-size="12" text-anchor="middle">Datum Required</text>
+          <text x="189" y="160" fill="#b0bdd0" font-size="14">Relates feature</text>
+          <text x="189" y="173" fill="#b0bdd0" font-size="14">angle to a datum.</text>
+
+          <rect x="340" y="10" width="165" height="240" rx="8" fill="#0d2137" stroke="#1e3a5f" stroke-width="1.5"/>
+          <text x="422" y="32" fill="#00d4ff" font-size="14" text-anchor="middle" font-weight="bold">LOCATION</text>
+          <line x1="350" y1="38" x2="495" y2="38" stroke="#1e3a5f" stroke-width="1"/>
+          <text x="354" y="58" fill="#e2e8f0" font-size="13">⊕  True Position</text>
+          <text x="354" y="80" fill="#e2e8f0" font-size="13">◎  Concentricity</text>
+          <text x="354" y="102" fill="#e2e8f0" font-size="13">=  Symmetry</text>
+          <rect x="350" y="118" width="145" height="20" rx="4" fill="rgba(255,107,53,0.08)" stroke="rgba(255,107,53,0.3)" stroke-width="1"/>
+          <text x="423" y="132" fill="#ff6b35" font-size="12" text-anchor="middle">Datum Required</text>
+
+          <rect x="515" y="10" width="175" height="240" rx="8" fill="#0d2137" stroke="#1e3a5f" stroke-width="1.5"/>
+          <text x="602" y="32" fill="#00d4ff" font-size="14" text-anchor="middle" font-weight="bold">RUNOUT &amp; PROFILE</text>
+          <line x1="525" y1="38" x2="680" y2="38" stroke="#1e3a5f" stroke-width="1"/>
+          <text x="529" y="58" fill="#e2e8f0" font-size="13">↗  Circular Runout</text>
+          <text x="529" y="80" fill="#e2e8f0" font-size="13">⇗  Total Runout</text>
+          <text x="529" y="102" fill="#e2e8f0" font-size="13">⌒  Profile of Line</text>
+          <text x="529" y="124" fill="#e2e8f0" font-size="13">⌓  Profile of Surface</text>
+          <rect x="525" y="138" width="145" height="20" rx="4" fill="rgba(255,107,53,0.08)" stroke="rgba(255,107,53,0.3)" stroke-width="1"/>
+          <text x="598" y="152" fill="#ff6b35" font-size="12" text-anchor="middle">Datum Required (Runout)</text>
+        </svg>
+      </div>
+
+      <div class="diagram-box">
+        <div class="diagram-title">Feature Control Frame — How to Read</div>
+        <svg width="100%" viewBox="0 0 660 140" style="max-width:660px;display:block;margin:auto">
+          <rect width="660" height="140" fill="#0a1628" rx="10"/>
+          <rect x="40" y="40" width="50" height="50" fill="none" stroke="#00d4ff" stroke-width="2"/>
+          <text x="65" y="72" fill="#39ff14" font-size="20" text-anchor="middle">⊕</text>
+          <rect x="90" y="40" width="120" height="50" fill="none" stroke="#00d4ff" stroke-width="2"/>
+          <text x="150" y="72" fill="#e2e8f0" font-size="16" text-anchor="middle">⌀0.5 Ⓜ</text>
+          <rect x="210" y="40" width="55" height="50" fill="none" stroke="#00d4ff" stroke-width="2"/>
+          <text x="237" y="72" fill="#ff6b35" font-size="16" text-anchor="middle">A</text>
+          <rect x="265" y="40" width="50" height="50" fill="none" stroke="#00d4ff" stroke-width="2"/>
+          <text x="290" y="72" fill="#ff6b35" font-size="16" text-anchor="middle">B</text>
+          <rect x="315" y="40" width="50" height="50" fill="none" stroke="#00d4ff" stroke-width="2"/>
+          <text x="340" y="72" fill="#ff6b35" font-size="16" text-anchor="middle">C</text>
+          <line x1="65" y1="90" x2="65" y2="108" stroke="#00d4ff" stroke-width="1" stroke-dasharray="3,2"/>
+          <text x="65" y="120" fill="#00d4ff" font-size="14" text-anchor="middle">Symbol</text>
+          <line x1="150" y1="90" x2="150" y2="108" stroke="#00d4ff" stroke-width="1" stroke-dasharray="3,2"/>
+          <text x="150" y="120" fill="#00d4ff" font-size="14" text-anchor="middle">Tolerance + MMC</text>
+          <line x1="237" y1="90" x2="237" y2="108" stroke="#ff6b35" stroke-width="1" stroke-dasharray="3,2"/>
+          <text x="237" y="120" fill="#ff6b35" font-size="14" text-anchor="middle">Primary</text>
+          <line x1="290" y1="90" x2="290" y2="108" stroke="#ff6b35" stroke-width="1" stroke-dasharray="3,2"/>
+          <text x="290" y="120" fill="#ff6b35" font-size="14" text-anchor="middle">Secondary</text>
+          <line x1="340" y1="90" x2="340" y2="108" stroke="#ff6b35" stroke-width="1" stroke-dasharray="3,2"/>
+          <text x="340" y="120" fill="#ff6b35" font-size="14" text-anchor="middle">Tertiary</text>
+          <text x="450" y="55" fill="#b0bdd0" font-size="12">Read as: "Position within</text>
+          <text x="450" y="70" fill="#e2e8f0" font-size="12">⌀0.5 at MMC relative to</text>
+          <text x="450" y="85" fill="#e2e8f0" font-size="12">datums A, B, C"</text>
+        </svg>
+      </div>
+
+      <div class="qa-card" onclick="toggleQA(this)">
+        <div class="qa-question"><span class="q-num">Q1</span><span class="q-text">What is GD&T and why is it used instead of coordinate tolerancing?</span><span class="q-toggle">+</span></div>
+        <div class="qa-answer">
+          <div class="ans-text"><strong>GD&T</strong> is an engineering drawing language using symbols to communicate allowable variations of form, size, orientation, and location. Based on ASME Y14.5 (US) or ISO 1101 (International).</div>
+          <div class="key-points"><div class="key-points-title">Key Advantages Over ± Tolerancing</div><ul>
+            <li><strong>More usable tolerance area:</strong> Circular zone gives 57% more area than a square ± zone</li>
+            <li><strong>Function-based:</strong> Tolerances reflect how parts actually work</li>
+            <li><strong>Bonus tolerance:</strong> MMC/LMC modifiers allow extra tolerance as features depart from critical size</li>
+            <li><strong>Unambiguous:</strong> Eliminates inspector interpretation differences</li>
+            <li><strong>Clear datum references:</strong> Establishes exact measurement references</li>
+          </ul></div>
+          <div class="alert info">💡 GD&T circular zone for position gives ~57% more usable tolerance area than a square ± zone — commonly tested insight!</div>
+        </div>
+      </div>
+
+      <div class="qa-card" onclick="toggleQA(this)">
+        <div class="qa-question"><span class="q-num">Q2</span><span class="q-text">Explain MMC, LMC, and RFS. When do you apply each?</span><span class="q-toggle">+</span></div>
+        <div class="qa-answer">
+          <table class="info-table"><tr><th>Modifier</th><th>Meaning</th><th>Used When</th></tr>
+          <tr><td>Ⓜ MMC</td><td>Smallest hole / largest shaft</td><td>Assembly clearance — bonus tolerance for fit</td></tr>
+          <tr><td>Ⓛ LMC</td><td>Largest hole / smallest shaft</td><td>Edge distance / wall thickness critical</td></tr>
+          <tr><td>Ⓢ RFS</td><td>Tolerance constant regardless of size</td><td>Balance / runout critical (default)</td></tr></table>
+          <div class="alert tip">✅ Bonus tolerance at MMC: If Ø10 hole with 0.2 tol at MMC, actual hole = Ø10.4 → bonus = 0.4 → total tol = 0.6</div>
+        </div>
+      </div>
+
+      <div class="qa-card" onclick="toggleQA(this)">
+        <div class="qa-question"><span class="q-num">Q3</span><span class="q-text">What is a Datum? Explain the 3-2-1 locating principle.</span><span class="q-toggle">+</span></div>
+        <div class="qa-answer">
+          <div class="ans-text">A <strong>datum</strong> is a theoretically exact geometric reference (plane, axis, or point) from which measurements are made.</div>
+          <div class="key-points"><div class="key-points-title">3-2-1 Locating Principle</div><ul>
+            <li><strong>Primary datum (3 points):</strong> Largest flat surface — constrains 3 DOF (z-translation, x & y rotation)</li>
+            <li><strong>Secondary datum (2 points):</strong> Next surface — constrains 2 DOF (x-translation, z-rotation)</li>
+            <li><strong>Tertiary datum (1 point):</strong> Stops last DOF (y-translation)</li>
+            <li>Select datums based on functional requirements, not convenience</li>
+          </ul></div>
+        </div>
+      </div>
+
+      <div class="qa-card" onclick="toggleQA(this)">
+        <div class="qa-question"><span class="q-num">Q4</span><span class="q-text">What is True Position and how is it calculated?</span><span class="q-toggle">+</span></div>
+        <div class="qa-answer">
+          <div class="ans-text"><strong>True Position (⊕)</strong> defines the exact theoretical location of a feature. The actual feature must fall within a cylindrical tolerance zone centered on the true position.</div>
+          <div class="formula">Actual Deviation = 2 × √[(Δx)² + (Δy)²]</div>
+          <div class="ans-text">Example: Hole at X=50.2, Y=29.9 (nominal X=50, Y=30)<br>Deviation = 2 × √[0.2² + 0.1²] = 2 × √0.05 = <em>0.447 mm</em></div>
+        </div>
+      </div>
+
+      <div class="qa-card" onclick="toggleQA(this)">
+        <div class="qa-question"><span class="q-num">Q5</span><span class="q-text">Flatness vs Straightness vs Parallelism — what's the difference?</span><span class="q-toggle">+</span></div>
+        <div class="qa-answer">
+          <table class="info-table"><tr><th>Control</th><th>Controls</th><th>Datum?</th></tr>
+          <tr><td>Flatness ⏥</td><td>All points within two parallel planes</td><td>No</td></tr>
+          <tr><td>Straightness ⎯</td><td>All points of a line/axis within zone</td><td>No</td></tr>
+          <tr><td>Parallelism ∥</td><td>Surface/axis parallel to a datum</td><td>Yes</td></tr></table>
+          <div class="alert info">💡 Flatness = self-contained. Parallelism = relative to datum. A parallel surface must be flat, but not vice versa.</div>
+        </div>
+      </div>
+      <div class="tags"><span class="tag">ASME Y14.5</span><span class="tag orange">MMC / LMC</span><span class="tag green">3-2-1 Datum</span><span class="tag">True Position</span><span class="tag orange">FCF</span></div>
+    </div>
+
+    <!-- ══ T2: SHEET METAL DESIGN ══ -->
+    <div id="t2" class="topic-section">
+      <div class="topic-header">
+        <div class="topic-tag">Topic 02 · Design Guidelines</div>
+        <div class="topic-title">Sheet Metal Design</div>
+        <div class="topic-desc">Sheet metal design involves creating parts from flat metal by applying rules for bending, cutting, and forming to ensure manufacturability.</div>
+        <div class="progress-bar"></div>
+      </div>
+      <div class="diagram-box">
+        <div class="diagram-title">Bend Allowance & K-Factor</div>
+        <svg width="100%" viewBox="0 0 680 180" style="max-width:680px;display:block;margin:auto">
+          <rect width="680" height="180" fill="#0a1628" rx="10"/>
+          <rect x="20" y="70" width="200" height="20" rx="3" fill="#1e4a7a" stroke="#00d4ff" stroke-width="1.5"/>
+          <text x="120" y="62" fill="#00d4ff" font-size="12" text-anchor="middle">FLAT BLANK</text>
+          <text x="240" y="85" fill="#39ff14" font-size="18">→</text>
+          <rect x="280" y="70" width="110" height="20" rx="2" fill="#1e4a7a" stroke="#00d4ff" stroke-width="1.5"/>
+          <rect x="390" y="15" width="20" height="75" rx="2" fill="#1e4a7a" stroke="#00d4ff" stroke-width="1.5"/>
+          <line x1="280" y1="80" x2="400" y2="80" stroke="#39ff14" stroke-width="1.5" stroke-dasharray="5,3"/>
+          <line x1="400" y1="80" x2="400" y2="15" stroke="#39ff14" stroke-width="1.5" stroke-dasharray="5,3"/>
+          <text x="340" y="100" fill="#39ff14" font-size="14" text-anchor="middle">Neutral Axis</text>
+          <text x="340" y="62" fill="#e2e8f0" font-size="13">L1</text>
+          <text x="405" y="50" fill="#e2e8f0" font-size="13">L2</text>
+          <rect x="450" y="15" width="220" height="155" rx="8" fill="#0d2137" stroke="#1e3a5f" stroke-width="1"/>
+          <text x="560" y="35" fill="#00d4ff" font-size="13" text-anchor="middle">KEY FORMULAS</text>
+          <text x="460" y="55" fill="#39ff14" font-size="12">Bend Allowance (BA):</text>
+          <text x="460" y="69" fill="#e2e8f0" font-size="14">BA = π/180 × A × (R + K×t)</text>
+          <text x="460" y="92" fill="#39ff14" font-size="12">Blank Length:</text>
+          <text x="460" y="106" fill="#e2e8f0" font-size="14">BL = L1 + L2 + BA</text>
+          <text x="460" y="129" fill="#39ff14" font-size="12">K-Factor range:</text>
+          <text x="460" y="143" fill="#e2e8f0" font-size="14">Soft: 0.33 | Mild steel: 0.41</text>
+          <text x="460" y="157" fill="#e2e8f0" font-size="14">Hard/SS: 0.45–0.50</text>
+          <text x="25" y="118" fill="#ff6b35" font-size="14">BA = Bend Allowance</text>
+          <text x="25" y="132" fill="#ff6b35" font-size="14">BL = Blank Length</text>
+          <text x="25" y="146" fill="#ff6b35" font-size="14">A = angle, R = inside R</text>
+          <text x="25" y="160" fill="#ff6b35" font-size="14">t = thickness</text>
+        </svg>
+      </div>
+      <div class="qa-card" onclick="toggleQA(this)">
+        <div class="qa-question"><span class="q-num">Q1</span><span class="q-text">What is the K-factor in sheet metal and why is it important?</span><span class="q-toggle">+</span></div>
+        <div class="qa-answer">
+          <div class="ans-text">The <strong>K-factor</strong> is the ratio of the neutral axis distance from the inside bend surface to the total material thickness.</div>
+          <div class="formula">K = t_neutral / t_total</div>
+          <div class="key-points"><div class="key-points-title">K-Factor by Material</div><ul>
+            <li><strong>Soft copper, brass:</strong> K ≈ 0.35</li>
+            <li><strong>Aluminum, mild steel:</strong> K ≈ 0.41</li>
+            <li><strong>Hard steel, stainless:</strong> K ≈ 0.45–0.50</li>
+            <li>Wrong K-factor → blank over or under size</li>
+          </ul></div>
+        </div>
+      </div>
+      <div class="qa-card" onclick="toggleQA(this)">
+        <div class="qa-question"><span class="q-num">Q2</span><span class="q-text">What are the design rules for holes in sheet metal?</span><span class="q-toggle">+</span></div>
+        <div class="qa-answer">
+          <table class="info-table"><tr><th>Parameter</th><th>Rule</th><th>Reason</th></tr>
+          <tr><td>Min hole diameter</td><td>≥ material thickness t</td><td>Prevent punch breakage</td></tr>
+          <tr><td>Hole to edge</td><td>≥ 1.5t to 2t</td><td>Prevent tearing</td></tr>
+          <tr><td>Hole to bend</td><td>≥ 2t + bend radius</td><td>Prevent hole distortion</td></tr>
+          <tr><td>Hole to hole</td><td>≥ 2× hole diameter</td><td>Prevent web distortion</td></tr></table>
+        </div>
+      </div>
+      <div class="qa-card" onclick="toggleQA(this)">
+        <div class="qa-question"><span class="q-num">Q3</span><span class="q-text">What is springback and how do you compensate for it?</span><span class="q-toggle">+</span></div>
+        <div class="qa-answer">
+          <div class="ans-text"><strong>Springback</strong> is elastic recovery (partial unbending) after bending force is removed.</div>
+          <div class="key-points"><div class="key-points-title">Compensation Methods</div><ul>
+            <li><strong>Over-bending:</strong> Bend to smaller angle than required</li>
+            <li><strong>Bottoming/Coining:</strong> Full pressure through thickness → nearly zero springback</li>
+            <li><strong>Stretch bending:</strong> Apply tension during bending</li>
+            <li>High yield strength → more springback</li>
+          </ul></div>
+          <div class="alert warning">⚠️ HSLA/AHSS steels have much greater springback — critical in automotive stamping.</div>
+        </div>
+      </div>
+      <div class="qa-card" onclick="toggleQA(this)">
+        <div class="qa-question"><span class="q-num">Q4</span><span class="q-text">What is minimum bend radius? Typical values?</span><span class="q-toggle">+</span></div>
+        <div class="qa-answer">
+          <div class="ans-text"><strong>Minimum bend radius</strong> is the smallest inside radius before cracking occurs on the outer surface.</div>
+          <div class="key-points"><div class="key-points-title">Typical Min Bend Radii (× t)</div><ul>
+            <li>Soft aluminum 5052-H32: 0t (bend flat)</li>
+            <li>Mild steel 1018: 0.5t – 1t</li>
+            <li>Stainless steel 304: 1t – 1.5t</li>
+            <li>Aluminum 6061-T6: 2t – 3t</li>
+            <li>High-strength steel: 3t – 5t</li>
+          </ul></div>
+        </div>
+      </div>
+      <div class="tags"><span class="tag">K-Factor</span><span class="tag orange">Bend Allowance</span><span class="tag orange">Springback</span><span class="tag green">Min Bend Radius</span><span class="tag">Flat Pattern</span></div>
+    </div>
+
+    <!-- ══ T3: SHEET METAL MFG ══ -->
+    <div id="t3" class="topic-section">
+      <div class="topic-header">
+        <div class="topic-tag">Topic 03 · Manufacturing</div>
+        <div class="topic-title">Sheet Metal Manufacturing</div>
+        <div class="topic-desc">Sheet metal manufacturing covers cutting, forming, and joining operations to produce parts from flat metal blanks.</div>
+        <div class="progress-bar"></div>
+      </div>
+      <div class="qa-card" onclick="toggleQA(this)">
+        <div class="qa-question"><span class="q-num">Q1</span><span class="q-text">What is the difference between Blanking and Piercing?</span><span class="q-toggle">+</span></div>
+        <div class="qa-answer">
+          <table class="info-table"><tr><th>Operation</th><th>Desired Part</th><th>Waste</th><th>Use Case</th></tr>
+          <tr><td><strong>Blanking</strong></td><td>Punched-out piece (blank)</td><td>Remaining strip</td><td>Making flat blanks for forming</td></tr>
+          <tr><td><strong>Piercing</strong></td><td>Strip with hole</td><td>Punched slug</td><td>Making holes/slots in a part</td></tr></table>
+          <div class="key-points"><div class="key-points-title">Die Clearance Rule</div><ul>
+            <li>Clearance = 5–10% of material thickness per side</li>
+            <li>Too little → excessive force, rough edges</li>
+            <li>Too much → large burr, poor shear quality</li>
+          </ul></div>
+        </div>
+      </div>
+      <div class="qa-card" onclick="toggleQA(this)">
+        <div class="qa-question"><span class="q-num">Q2</span><span class="q-text">Compare Air Bending vs Bottoming vs Coining.</span><span class="q-toggle">+</span></div>
+        <div class="qa-answer">
+          <table class="info-table"><tr><th>Method</th><th>Force</th><th>Springback</th><th>Accuracy</th></tr>
+          <tr><td>Air Bending</td><td>Low</td><td>High — needs compensation</td><td>±1–2°</td></tr>
+          <tr><td>Bottoming</td><td>5–8× air</td><td>Minimal</td><td>±0.5°</td></tr>
+          <tr><td>Coining</td><td>10–30× air</td><td>Nearly zero</td><td>±0.1°</td></tr></table>
+          <div class="alert info">💡 Air bending is most common — less force, one tool set handles multiple angles.</div>
+        </div>
+      </div>
+      <div class="qa-card" onclick="toggleQA(this)">
+        <div class="qa-question"><span class="q-num">Q3</span><span class="q-text">What is Deep Drawing? What is the Limiting Draw Ratio?</span><span class="q-toggle">+</span></div>
+        <div class="qa-answer">
+          <div class="ans-text"><strong>Deep Drawing</strong> pulls a flat blank into a die cavity using a punch to form a cup/box. Material flows radially inward without cutting.</div>
+          <div class="formula">Draw Ratio (DR) = Blank Diameter / Punch Diameter | Max DR ≈ 1.8–2.3</div>
+          <div class="key-points"><div class="key-points-title">Key Parameters</div><ul>
+            <li>Blank holder force prevents wrinkling in flange</li>
+            <li>LDR = Limiting Draw Ratio — beyond this, part tears</li>
+            <li>Multiple draws with annealing for deep parts</li>
+          </ul></div>
+        </div>
+      </div>
+      <div class="qa-card" onclick="toggleQA(this)">
+        <div class="qa-question"><span class="q-num">Q4</span><span class="q-text">What is a Progressive Die and its advantages?</span><span class="q-toggle">+</span></div>
+        <div class="qa-answer">
+          <div class="ans-text">A <strong>Progressive Die</strong> performs multiple operations (blanking, piercing, bending) in sequential stations as metal strip advances with each press stroke.</div>
+          <div class="key-points"><div class="key-points-title">Advantages</div><ul>
+            <li>High speed, high volume — parts per stroke</li>
+            <li>Reduced labor — automatic strip feeding</li>
+            <li>Consistent accuracy — all ops in one die set</li>
+            <li>Best for: small complex parts (terminals, brackets, clips)</li>
+          </ul></div>
+        </div>
+      </div>
+      <div class="tags"><span class="tag">Blanking/Piercing</span><span class="tag orange">Air Bending</span><span class="tag orange">Deep Drawing</span><span class="tag green">Progressive Die</span><span class="tag">Press Brake</span></div>
+    </div>
+
+    <!-- ══ T4: CASTING DESIGN ══ -->
+    <div id="t4" class="topic-section">
+      <div class="topic-header">
+        <div class="topic-tag">Topic 04 · Design Guidelines</div>
+        <div class="topic-title">Casting Parts Design</div>
+        <div class="topic-desc">Good casting design minimizes defects, reduces machining, and enables reliable production. Key considerations include draft angles, wall thickness, and parting line placement.</div>
+        <div class="progress-bar"></div>
+      </div>
+      <div class="qa-card" onclick="toggleQA(this)">
+        <div class="qa-question"><span class="q-num">Q1</span><span class="q-text">Why is draft angle important? What values are used?</span><span class="q-toggle">+</span></div>
+        <div class="qa-answer">
+          <div class="ans-text"><strong>Draft angle</strong> is taper added to vertical walls allowing the part to be pulled from the mold without sticking or damaging the mold.</div>
+          <table class="info-table"><tr><th>Process</th><th>External</th><th>Internal</th></tr>
+          <tr><td>Die Casting (Al)</td><td>0.5°–2°</td><td>2°–3°</td></tr>
+          <tr><td>Sand Casting</td><td>2°–5°</td><td>3°–7°</td></tr>
+          <tr><td>Investment Casting</td><td>0°–1°</td><td>1°–2°</td></tr>
+          <tr><td>Injection Moulding</td><td>1°–2°</td><td>2°–5°</td></tr></table>
+          <div class="alert info">💡 Internal features always need more draft than external walls.</div>
+        </div>
+      </div>
+      <div class="qa-card" onclick="toggleQA(this)">
+        <div class="qa-question"><span class="q-num">Q2</span><span class="q-text">What are undercuts and how do you handle them?</span><span class="q-toggle">+</span></div>
+        <div class="qa-answer">
+          <div class="ans-text">An <strong>undercut</strong> is a feature that prevents the part from being pulled straight out of the mold.</div>
+          <div class="key-points"><div class="key-points-title">Solutions</div><ul>
+            <li><strong>Side actions/slides:</strong> Move perpendicular to draw before ejection</li>
+            <li><strong>Lifters:</strong> Angled pins that push part away from undercut</li>
+            <li><strong>Redesign to eliminate:</strong> Best DFM solution</li>
+            <li><strong>Sand cores:</strong> Breakaway cores for sand casting</li>
+          </ul></div>
+          <div class="alert warning">⚠️ Every slide adds $5,000–$30,000+ tooling cost. Always try to design undercuts out first.</div>
+        </div>
+      </div>
+      <div class="qa-card" onclick="toggleQA(this)">
+        <div class="qa-question"><span class="q-num">Q3</span><span class="q-text">Why must wall thickness be uniform in castings?</span><span class="q-toggle">+</span></div>
+        <div class="qa-answer">
+          <div class="ans-text">Non-uniform walls cause differential solidification — thick sections cool slowly while thin sections cool fast, causing:</div>
+          <div class="key-points"><div class="key-points-title">Problems & Guidelines</div><ul>
+            <li>Shrinkage porosity — last to solidify pulls metal inward</li>
+            <li>Hot tearing — tensile stresses in constrained thin areas</li>
+            <li>Warpage — unequal thermal contraction</li>
+            <li>Al Die Casting: 1.5–5 mm | Sand Casting Steel: 5–25 mm</li>
+          </ul></div>
+        </div>
+      </div>
+      <div class="tags"><span class="tag">Draft Angle</span><span class="tag orange">Parting Line</span><span class="tag orange">Undercuts</span><span class="tag green">Wall Thickness</span><span class="tag">Fillets</span></div>
+    </div>
+
+    <!-- ══ T5: CASTING MFG ══ -->
+    <div id="t5" class="topic-section">
+      <div class="topic-header">
+        <div class="topic-tag">Topic 05 · Manufacturing Process</div>
+        <div class="topic-title">Casting Manufacturing Processes</div>
+        <div class="topic-desc">Casting pours molten metal into a mold, allows solidification, then removes the solid part. Different methods suit different volumes, tolerances, and materials.</div>
+        <div class="progress-bar"></div>
+      </div>
+      <div class="qa-card" onclick="toggleQA(this)">
+        <div class="qa-question"><span class="q-num">Q1</span><span class="q-text">Explain the Sand Casting process step by step.</span><span class="q-toggle">+</span></div>
+        <div class="qa-answer">
+          <div class="key-points"><div class="key-points-title">Sand Casting Steps</div><ul>
+            <li><strong>Step 1 — Pattern:</strong> Create pattern slightly larger than part (shrinkage allowance)</li>
+            <li><strong>Step 2 — Mold:</strong> Pack green sand around pattern in flask (cope=top, drag=bottom)</li>
+            <li><strong>Step 3 — Cores:</strong> Insert sand cores for internal cavities</li>
+            <li><strong>Step 4 — Assembly:</strong> Remove pattern, add gating (sprue, runner, gate), close mold</li>
+            <li><strong>Step 5 — Pour:</strong> Molten metal at correct temp and rate</li>
+            <li><strong>Step 6 — Cool:</strong> Allow full solidification</li>
+            <li><strong>Step 7 — Shakeout:</strong> Break mold, extract casting</li>
+            <li><strong>Step 8 — Fettling:</strong> Remove gates/risers, shot blast, grind</li>
+          </ul></div>
+        </div>
+      </div>
+      <div class="qa-card" onclick="toggleQA(this)">
+        <div class="qa-question"><span class="q-num">Q2</span><span class="q-text">What are common casting defects and their causes?</span><span class="q-toggle">+</span></div>
+        <div class="qa-answer">
+          <table class="info-table"><tr><th>Defect</th><th>Cause</th><th>Prevention</th></tr>
+          <tr><td>Shrinkage Porosity</td><td>Insufficient feed metal</td><td>Proper risers, directional solidification</td></tr>
+          <tr><td>Gas Porosity</td><td>Dissolved gases (H₂ in Al)</td><td>Degassing, dry molds</td></tr>
+          <tr><td>Cold Shut</td><td>Two streams don't fuse</td><td>Increase temp/pour rate</td></tr>
+          <tr><td>Misrun</td><td>Metal solidifies before filling</td><td>Increase temp, redesign gating</td></tr>
+          <tr><td>Hot Tear</td><td>Tensile stress during solidification</td><td>Fillets, uniform thickness</td></tr>
+          <tr><td>Flash</td><td>Metal leaks at parting line</td><td>Better clamping, inspect mold</td></tr></table>
+        </div>
+      </div>
+      <div class="qa-card" onclick="toggleQA(this)">
+        <div class="qa-question"><span class="q-num">Q3</span><span class="q-text">Hot Chamber vs Cold Chamber Die Casting — differences?</span><span class="q-toggle">+</span></div>
+        <div class="qa-answer">
+          <table class="info-table"><tr><th>Feature</th><th>Hot Chamber</th><th>Cold Chamber</th></tr>
+          <tr><td>Injection system</td><td>Submerged in molten bath</td><td>Separate — metal ladled in</td></tr>
+          <tr><td>Cycle time</td><td>Faster (400–900 shots/hr)</td><td>Slower (75–150 shots/hr)</td></tr>
+          <tr><td>Materials</td><td>Zinc, Tin, Lead</td><td>Aluminum, Brass, Magnesium</td></tr>
+          <tr><td>Why not Al in hot?</td><td colspan="2">Al attacks and erodes submerged injection components</td></tr></table>
+        </div>
+      </div>
+      <div class="tags"><span class="tag">Sand Casting</span><span class="tag orange">Die Casting</span><span class="tag orange">Investment Casting</span><span class="tag green">Porosity</span><span class="tag">Gating System</span></div>
+    </div>
+
+    <!-- ══ T6: PLASTIC DESIGN ══ -->
+    <div id="t6" class="topic-section">
+      <div class="topic-header">
+        <div class="topic-tag">Topic 06 · Design Guidelines</div>
+        <div class="topic-title">Plastic Design</div>
+        <div class="topic-desc">Plastic part design requires understanding material behavior, moulding constraints, and structural requirements — bosses, ribs, snap fits, and living hinges.</div>
+        <div class="progress-bar"></div>
+      </div>
+      <div class="qa-card" onclick="toggleQA(this)">
+        <div class="qa-question"><span class="q-num">Q1</span><span class="q-text">What are the design rules for bosses in plastic parts?</span><span class="q-toggle">+</span></div>
+        <div class="qa-answer">
+          <div class="key-points"><div class="key-points-title">Boss Design Rules</div><ul>
+            <li>Outer diameter = 2× screw outer diameter</li>
+            <li>Wall thickness = 60% of nominal wall (avoid sink marks)</li>
+            <li>Fillet at base R ≥ 25% of boss wall</li>
+            <li>Draft angle: 0.5°–1° inner and outer</li>
+            <li>Height ≤ 3× outer diameter — taller needs gussets</li>
+            <li>Gusset thickness = 50% of boss wall</li>
+          </ul></div>
+        </div>
+      </div>
+      <div class="qa-card" onclick="toggleQA(this)">
+        <div class="qa-question"><span class="q-num">Q2</span><span class="q-text">What is a living hinge and how do you design one?</span><span class="q-toggle">+</span></div>
+        <div class="qa-answer">
+          <div class="ans-text">A <strong>living hinge</strong> is a thin flexible integral hinge moulded with two rigid parts. Best material: <em>Polypropylene (PP)</em> due to excellent fatigue resistance.</div>
+          <div class="key-points"><div class="key-points-title">Design Guidelines</div><ul>
+            <li>Thickness: 0.2–0.5 mm (PP)</li>
+            <li>Width: 5–15 mm (wider = lower stress)</li>
+            <li>Parabolic profile distributes stress better than flat</li>
+            <li>Gate must flow across the hinge (perpendicular orientation)</li>
+            <li>Flex while still warm (&lt;2 min after ejection) → millions of cycles life</li>
+          </ul></div>
+        </div>
+      </div>
+      <div class="qa-card" onclick="toggleQA(this)">
+        <div class="qa-question"><span class="q-num">Q3</span><span class="q-text">How do you design a cantilever snap fit?</span><span class="q-toggle">+</span></div>
+        <div class="qa-answer">
+          <div class="formula">Max Strain ε = 1.5 × δ × t / L²</div>
+          <div class="key-points"><div class="key-points-title">Design Rules</div><ul>
+            <li>Allowable strain: ABS 2%, PP 6%, PC 4%, PA 4%</li>
+            <li>Increase L or decrease t to reduce strain</li>
+            <li>Engagement angle: 30°–45° | Retention angle: 90° (permanent) or 15°–30° (releasable)</li>
+            <li>Taper arm thickness for uniform strain distribution</li>
+          </ul></div>
+        </div>
+      </div>
+      <div class="qa-card" onclick="toggleQA(this)">
+        <div class="qa-question"><span class="q-num">Q4</span><span class="q-text">What are the recommended wall thicknesses for common plastics?</span><span class="q-toggle">+</span></div>
+        <div class="qa-answer">
+          <table class="info-table"><tr><th>Material</th><th>Nominal Wall (mm)</th></tr>
+          <tr><td>ABS</td><td>1.5–4.5 mm</td></tr>
+          <tr><td>PC</td><td>1.0–4.0 mm</td></tr>
+          <tr><td>PP</td><td>0.8–3.8 mm</td></tr>
+          <tr><td>PA (Nylon)</td><td>1.0–3.0 mm</td></tr>
+          <tr><td>POM (Acetal)</td><td>0.8–3.0 mm</td></tr></table>
+          <div class="alert warning">⚠️ Rule: Keep wall thickness uniform within ±25%. Use gradual 3× transition zones between thick and thin sections.</div>
+        </div>
+      </div>
+      <div class="tags"><span class="tag">Wall Thickness</span><span class="tag orange">Boss Design</span><span class="tag orange">Rib Design</span><span class="tag green">Living Hinge</span><span class="tag green">Snap Fit</span></div>
+    </div>
+
+    <!-- ══ T7: INJECTION MOULDING ══ -->
+    <div id="t7" class="topic-section">
+      <div class="topic-header">
+        <div class="topic-tag">Topic 07 · Manufacturing Process</div>
+        <div class="topic-title">Basics of Injection Moulding</div>
+        <div class="topic-desc">Injection moulding is the most common plastic manufacturing process — ideal for high-volume, complex parts with tight tolerances.</div>
+        <div class="progress-bar"></div>
+      </div>
+      <div class="qa-card" onclick="toggleQA(this)">
+        <div class="qa-question"><span class="q-num">Q1</span><span class="q-text">Explain the injection moulding cycle step by step.</span><span class="q-toggle">+</span></div>
+        <div class="qa-answer">
+          <div class="key-points"><div class="key-points-title">Injection Moulding Cycle (5 Phases)</div><ul>
+            <li><strong>1. Mold Closing & Clamping:</strong> Movable half closes, clamp force applied to prevent mold opening</li>
+            <li><strong>2. Injection (Fill):</strong> Screw injects molten plastic at high speed. Cavity fills 90–99%</li>
+            <li><strong>3. Packing & Holding:</strong> Extra material forced in to compensate shrinkage. Held until gate freezes</li>
+            <li><strong>4. Cooling:</strong> Part solidifies — longest phase, 50–70% of total cycle time</li>
+            <li><strong>5. Ejection:</strong> Mold opens, ejector pins push part out. Screw plasticates next shot</li>
+          </ul></div>
+          <div class="formula">Cycle Time = Fill + Pack + Cooling + Open/Eject + Close = 10–120 sec typical</div>
+        </div>
+      </div>
+      <div class="qa-card" onclick="toggleQA(this)">
+        <div class="qa-question"><span class="q-num">Q2</span><span class="q-text">What are the different gate types? How do you choose?</span><span class="q-toggle">+</span></div>
+        <div class="qa-answer">
+          <table class="info-table"><tr><th>Gate Type</th><th>Best For</th><th>Limitation</th></tr>
+          <tr><td>Sprue Gate</td><td>Single cavity, thick parts</td><td>Large witness mark</td></tr>
+          <tr><td>Edge/Side Gate</td><td>Most common — flat parts</td><td>Edge witness mark</td></tr>
+          <tr><td>Submarine/Tunnel</td><td>Auto-degate, multi-cavity</td><td>Softer materials only</td></tr>
+          <tr><td>Hot Tip/Valve Gate</td><td>No waste, clean mark</td><td>High tooling cost</td></tr>
+          <tr><td>Film/Fan Gate</td><td>Large flat parts, min warpage</td><td>Manual trimming</td></tr></table>
+        </div>
+      </div>
+      <div class="qa-card" onclick="toggleQA(this)">
+        <div class="qa-question"><span class="q-num">Q3</span><span class="q-text">How do you calculate clamping force?</span><span class="q-toggle">+</span></div>
+        <div class="qa-answer">
+          <div class="formula">Clamp Force (tons) = Projected Area (cm²) × Cavity Pressure (bar) × SF / 1000</div>
+          <div class="ans-text">Cavity pressure: 200–500 bar | Safety factor: 1.1–1.25<br><br>
+          Example: Area=120 cm², P=350 bar, SF=1.1 → <em>46.2 tons</em><br>
+          Rule of thumb: <strong>2–5 tons per cm²</strong> projected area</div>
+          <div class="alert tip">✅ Undersized clamp → mold flashing. Always apply safety factor.</div>
+        </div>
+      </div>
+      <div class="tags"><span class="tag">Injection Cycle</span><span class="tag orange">Gate Types</span><span class="tag orange">Hot Runner</span><span class="tag green">Clamping Force</span></div>
+    </div>
+
+    <!-- ══ T8: MOULDING DEFECTS ══ -->
+    <div id="t8" class="topic-section">
+      <div class="topic-header">
+        <div class="topic-tag">Topic 08 · Quality & Defects</div>
+        <div class="topic-title">Plastic & Moulding Defects</div>
+        <div class="topic-desc">Understanding moulding defects helps engineers design better parts, optimize process parameters, and reduce scrap costs.</div>
+        <div class="progress-bar"></div>
+      </div>
+      <div class="qa-card" onclick="toggleQA(this)">
+        <div class="qa-question"><span class="q-num">Q1</span><span class="q-text">List and explain 8 major injection moulding defects.</span><span class="q-toggle">+</span></div>
+        <div class="qa-answer">
+          <table class="info-table"><tr><th>Defect</th><th>Root Cause</th><th>Remedy</th></tr>
+          <tr><td>Sink Mark</td><td>Thick section, low pack pressure</td><td>Core out, increase pack P, reduce rib t</td></tr>
+          <tr><td>Warpage</td><td>Non-uniform cooling, residual stress</td><td>Uniform wall, balanced cooling, longer cool time</td></tr>
+          <tr><td>Short Shot</td><td>Low injection speed/pressure, blocked vents</td><td>Increase speed/pressure/temp, add vents</td></tr>
+          <tr><td>Flash</td><td>High injection P, worn mold, low clamp</td><td>Reduce P, increase clamp, inspect parting line</td></tr>
+          <tr><td>Weld Line</td><td>Two flow fronts meeting at low temp</td><td>Reposition gate, increase melt temp</td></tr>
+          <tr><td>Burn Marks</td><td>Trapped air (diesel effect)</td><td>Add vents, reduce speed, check gate size</td></tr>
+          <tr><td>Jetting</td><td>Material jets without touching walls</td><td>Larger gate, reposition gate, reduce speed</td></tr>
+          <tr><td>Delamination</td><td>Contamination, moisture, incompatible mix</td><td>Dry material, clean barrel, purge</td></tr></table>
+        </div>
+      </div>
+      <div class="qa-card" onclick="toggleQA(this)">
+        <div class="qa-question"><span class="q-num">Q2</span><span class="q-text">What causes sink marks and how are they prevented?</span><span class="q-toggle">+</span></div>
+        <div class="qa-answer">
+          <div class="ans-text"><strong>Sink marks</strong> are surface depressions typically opposite a thick section or boss. The surface solidifies first; the thick core contracts and pulls the skin inward.</div>
+          <div class="key-points"><div class="key-points-title">Prevention</div><ul>
+            <li>Design: Reduce wall thickness, core out thick sections</li>
+            <li>Rib thickness = max 50–60% of nominal wall</li>
+            <li>Process: Increase pack pressure and pack time</li>
+            <li>Material: Semi-crystalline (PP, PA) sink more than amorphous (ABS, PC)</li>
+          </ul></div>
+        </div>
+      </div>
+      <div class="qa-card" onclick="toggleQA(this)">
+        <div class="qa-question"><span class="q-num">Q3</span><span class="q-text">What is warpage and how do you minimize it?</span><span class="q-toggle">+</span></div>
+        <div class="qa-answer">
+          <div class="ans-text"><strong>Warpage</strong> is dimensional distortion caused by differential shrinkage — different areas shrink by different amounts creating internal stresses.</div>
+          <div class="key-points"><div class="key-points-title">Design Countermeasures</div><ul>
+            <li>Maintain uniform wall thickness (most important factor)</li>
+            <li>Symmetric part geometry for balanced cooling</li>
+            <li>Use glass-filled grades — GF reduces shrinkage differential</li>
+            <li>Gate into thickest section, flow toward thin sections</li>
+            <li>Balanced symmetric cooling channels — same temp both halves</li>
+          </ul></div>
+        </div>
+      </div>
+      <div class="tags"><span class="tag">Sink Marks</span><span class="tag orange">Warpage</span><span class="tag orange">Flash</span><span class="tag green">Short Shot</span><span class="tag">Weld Lines</span></div>
+    </div>
+
+    <!-- ══ T9: TOLERANCE STACKUP ══ -->
+    <div id="t9" class="topic-section">
+      <div class="topic-header">
+        <div class="topic-tag">Topic 09 · Analysis</div>
+        <div class="topic-title">Tolerance Stackup Analysis</div>
+        <div class="topic-desc">Tolerance stackup determines whether an assembly of parts with individual tolerances will function correctly at the extreme limits of variation.</div>
+        <div class="progress-bar"></div>
+      </div>
+      <div class="diagram-box">
+        <div class="diagram-title">1D Stackup Example</div>
+        <svg width="100%" viewBox="0 0 660 160" style="max-width:660px;display:block;margin:auto">
+          <rect width="660" height="160" fill="#0a1628" rx="10"/>
+          <rect x="15" y="55" width="330" height="55" rx="6" fill="none" stroke="#c084fc" stroke-width="2.5"/>
+          <text x="180" y="47" fill="#c084fc" font-size="12" text-anchor="middle">Housing 80 ±0.2</text>
+          <rect x="20" y="65" width="95" height="35" rx="4" fill="#0f3060" stroke="#00d4ff" stroke-width="2"/>
+          <text x="67" y="87" fill="#e2e8f0" font-size="12" text-anchor="middle">A: 30±0.1</text>
+          <rect x="118" y="65" width="80" height="35" rx="4" fill="#0f3060" stroke="#ff6b35" stroke-width="2"/>
+          <text x="158" y="87" fill="#e2e8f0" font-size="12" text-anchor="middle">B: 20±0.15</text>
+          <rect x="201" y="65" width="80" height="35" rx="4" fill="#0f3060" stroke="#39ff14" stroke-width="2"/>
+          <text x="241" y="87" fill="#e2e8f0" font-size="12" text-anchor="middle">C: 15±0.1</text>
+          <rect x="284" y="65" width="57" height="35" rx="4" fill="#1a0a00" stroke="#facc15" stroke-width="2" stroke-dasharray="4,3"/>
+          <text x="312" y="87" fill="#facc15" font-size="12" text-anchor="middle">Gap?</text>
+          <rect x="360" y="20" width="290" height="130" rx="8" fill="#0d2137" stroke="#facc15" stroke-width="1.5"/>
+          <text x="505" y="40" fill="#facc15" font-size="13" text-anchor="middle">WORST CASE</text>
+          <text x="370" y="60" fill="#e2e8f0" font-size="12">Nominal Gap = 80-(30+20+15) = 15 mm</text>
+          <text x="370" y="78" fill="#e2e8f0" font-size="12">WC Tol = ±(0.2+0.1+0.15+0.1) = ±0.55</text>
+          <text x="370" y="96" fill="#39ff14" font-size="12">Min Gap = 15 - 0.55 = 14.45 mm ✓</text>
+          <text x="370" y="116" fill="#00d4ff" font-size="12">RSS Tol = ±√(0.04+0.01+0.023+0.01)</text>
+          <text x="370" y="134" fill="#00d4ff" font-size="12">       = ±0.28 mm</text>
+        </svg>
+      </div>
+      <div class="qa-card" onclick="toggleQA(this)">
+        <div class="qa-question"><span class="q-num">Q1</span><span class="q-text">What is tolerance stackup and why is it important?</span><span class="q-toggle">+</span></div>
+        <div class="qa-answer">
+          <div class="ans-text"><strong>Tolerance stackup</strong> is the cumulative effect of individual part tolerances in an assembly. Each part has dimensional variation; assembled together, these add up and may exceed the functional requirement.</div>
+          <div class="key-points"><div class="key-points-title">Why It Matters</div><ul>
+            <li>Prevents assembly failures at tolerance extremes</li>
+            <li>Optimizes cost — loose where possible, tight only where critical</li>
+            <li>Identifies critical dimensions needing tighter control</li>
+            <li>Required for GD&T position calculations</li>
+            <li>Guides tolerance allocation across supply chain</li>
+          </ul></div>
+        </div>
+      </div>
+      <div class="qa-card" onclick="toggleQA(this)">
+        <div class="qa-question"><span class="q-num">Q2</span><span class="q-text">Worst Case vs RSS method — when to use each?</span><span class="q-toggle">+</span></div>
+        <div class="qa-answer">
+          <table class="info-table"><tr><th>Method</th><th>Formula</th><th>When to Use</th></tr>
+          <tr><td>Worst Case (WC)</td><td>T = Σ|ti|</td><td>Safety-critical, low volume, small n (≤3 parts)</td></tr>
+          <tr><td>RSS Statistical</td><td>T = √(Σti²)</td><td>High volume, normal distributions, ≥4 parts</td></tr>
+          <tr><td>RSS with Cf=1.5</td><td>T = 1.5×√(Σti²)</td><td>Realistic statistical with guard band</td></tr></table>
+          <div class="alert info">💡 RSS gives smaller total tolerance because it's statistically unlikely all parts are at worst condition simultaneously. WC = 100% assembly; RSS ≈ 99.73%.</div>
+        </div>
+      </div>
+      <div class="tags"><span class="tag">Worst Case</span><span class="tag orange">RSS Method</span><span class="tag green">1D Stackup</span><span class="tag">Tolerance Loop</span></div>
+    </div>
+
+    <!-- ══ T10: PROJECTS ══ -->
+    <div id="t10" class="topic-section">
+      <div class="topic-header">
+        <div class="topic-tag">Topic 10 · Career</div>
+        <div class="topic-title">Projects — How to Present</div>
+        <div class="topic-desc">Project discussions are critical in engineering interviews. Interviewers assess your design process, technical depth, problem-solving, and ownership.</div>
+        <div class="progress-bar"></div>
+      </div>
+      <div class="qa-card" onclick="toggleQA(this)">
+        <div class="qa-question"><span class="q-num">Q1</span><span class="q-text">How do you structure a project explanation? (STAR method)</span><span class="q-toggle">+</span></div>
+        <div class="qa-answer">
+          <div class="key-points"><div class="key-points-title">STAR Method</div><ul>
+            <li><strong>S — Situation:</strong> Context, product, customer requirement, constraints (cost, weight, volume)</li>
+            <li><strong>T — Task:</strong> Your specific responsibility and the design challenge</li>
+            <li><strong>A — Action:</strong> Design decisions YOU made — tools used (CAD, FEA, DFM, DFMEA), iterations, trade-offs</li>
+            <li><strong>R — Result:</strong> Quantified outcome — weight saved, cost reduced %, test pass, milestone hit</li>
+          </ul></div>
+          <div class="alert tip">✅ Interviewers love numbers: "I reduced part count from 12 to 7, saving $0.45/unit × 500K = $225K/year"</div>
+        </div>
+      </div>
+      <div class="qa-card" onclick="toggleQA(this)">
+        <div class="qa-question"><span class="q-num">Q2</span><span class="q-text">What key design decisions should you highlight?</span><span class="q-toggle">+</span></div>
+        <div class="qa-answer">
+          <div class="key-points"><div class="key-points-title">Highlight These Elements</div><ul>
+            <li>Material selection rationale — why this vs alternatives</li>
+            <li>Manufacturing process choice — why injection moulding vs casting?</li>
+            <li>GD&T/tolerance decisions — what was critical and why</li>
+            <li>DFM/DFA improvements — how you simplified manufacture</li>
+            <li>DFMEA insights — what failure modes you anticipated</li>
+            <li>Trade-offs — what you compromised and why (shows maturity)</li>
+            <li>Validation — FEA, prototype testing, DVT strategy</li>
+          </ul></div>
+        </div>
+      </div>
+      <div class="qa-card" onclick="toggleQA(this)">
+        <div class="qa-question"><span class="q-num">Q3</span><span class="q-text">How do you handle a project that failed in an interview?</span><span class="q-toggle">+</span></div>
+        <div class="qa-answer">
+          <div class="ans-text"><strong>Failures are valuable!</strong> Interviewers often rate honest failure discussions higher than perfect stories.</div>
+          <div class="key-points"><div class="key-points-title">How to Frame It</div><ul>
+            <li>State what happened clearly, no excuses</li>
+            <li>Explain what you learned technically (root cause)</li>
+            <li>Describe what you did differently as a result</li>
+            <li>Show the systemic change you implemented</li>
+            <li>Example: "Snap fit failed in drop test — I hadn't accounted for low-temperature ABS embrittlement. I added -20°C impact testing to our DV matrix and redesigned with a tapered arm."</li>
+          </ul></div>
+        </div>
+      </div>
+      <div class="tags"><span class="tag">STAR Method</span><span class="tag orange">Quantified Results</span><span class="tag green">Trade-offs</span><span class="tag">Validation</span></div>
+    </div>
+
+    <!-- ══ T11: BASIC MATERIALS ══ -->
+    <div id="t11" class="topic-section">
+      <div class="topic-header">
+        <div class="topic-tag">Topic 11 · Materials Science</div>
+        <div class="topic-title">Basic Materials</div>
+        <div class="topic-desc">Material selection is a fundamental decision affecting cost, weight, manufacturability, performance, and service life.</div>
+        <div class="progress-bar"></div>
+      </div>
+      <div class="qa-card" onclick="toggleQA(this)">
+        <div class="qa-question"><span class="q-num">Q1</span><span class="q-text">How do you select a material for a mechanical part?</span><span class="q-toggle">+</span></div>
+        <div class="qa-answer">
+          <div class="key-points"><div class="key-points-title">Material Selection Framework</div><ul>
+            <li><strong>1. Define requirements:</strong> Mechanical, physical, chemical, manufacturing, cost</li>
+            <li><strong>2. Constraints:</strong> Min yield strength, max weight, temp range, regulatory (RoHS, FDA)</li>
+            <li><strong>3. Material indices:</strong> Stiff beam: E/ρ | Strong light beam: σy^(2/3)/ρ — plot Ashby charts</li>
+            <li><strong>4. Shortlist:</strong> 3–5 candidates passing constraints</li>
+            <li><strong>5. Decision matrix:</strong> Weight criteria, score each material</li>
+            <li><strong>6. Validate:</strong> Sample testing, supplier qualification</li>
+          </ul></div>
+        </div>
+      </div>
+      <div class="qa-card" onclick="toggleQA(this)">
+        <div class="qa-question"><span class="q-num">Q2</span><span class="q-text">Key material properties — Steel vs Aluminum vs Titanium?</span><span class="q-toggle">+</span></div>
+        <div class="qa-answer">
+          <table class="info-table"><tr><th>Property</th><th>Mild Steel</th><th>Al 6061-T6</th><th>Ti-6Al-4V</th></tr>
+          <tr><td>Density (g/cc)</td><td>7.85</td><td>2.70</td><td>4.43</td></tr>
+          <tr><td>E Modulus (GPa)</td><td>200</td><td>68.9</td><td>114</td></tr>
+          <tr><td>Yield (MPa)</td><td>250</td><td>276</td><td>880</td></tr>
+          <tr><td>UTS (MPa)</td><td>410</td><td>310</td><td>950</td></tr>
+          <tr><td>CTE (µm/m°C)</td><td>12</td><td>23.6</td><td>8.6</td></tr></table>
+        </div>
+      </div>
+      <div class="qa-card" onclick="toggleQA(this)">
+        <div class="qa-question"><span class="q-num">Q3</span><span class="q-text">ABS vs PC vs PP vs PA — differences and applications?</span><span class="q-toggle">+</span></div>
+        <div class="qa-answer">
+          <table class="info-table"><tr><th>Plastic</th><th>Key Strength</th><th>Weakness</th><th>Typical Use</th></tr>
+          <tr><td>ABS</td><td>Good impact, easy to process</td><td>Poor UV resistance</td><td>Housings, automotive interior</td></tr>
+          <tr><td>PC</td><td>High impact, transparent, high temp</td><td>Stress cracking</td><td>Lenses, helmets, electronics</td></tr>
+          <tr><td>PP</td><td>Excellent fatigue, chemical resistant</td><td>Poor low-temp impact</td><td>Living hinges, packaging</td></tr>
+          <tr><td>PA (Nylon)</td><td>High strength, wear resistant</td><td>Moisture absorption</td><td>Gears, bearings, structural</td></tr>
+          <tr><td>POM (Acetal)</td><td>Best dimensional stability, low friction</td><td>Not UV stable</td><td>Gears, cams, sliders</td></tr></table>
+        </div>
+      </div>
+      <div class="tags"><span class="tag">Steel Grades</span><span class="tag orange">Aluminum Alloys</span><span class="tag green">Ashby Charts</span><span class="tag">Plastics ABS/PC/PP</span></div>
+    </div>
+
+    <!-- ══ T12: FINISHING ══ -->
+    <div id="t12" class="topic-section">
+      <div class="topic-header">
+        <div class="topic-tag">Topic 12 · Surface Engineering</div>
+        <div class="topic-title">Finishing Processes & Methods</div>
+        <div class="topic-desc">Surface finishing improves aesthetics, corrosion resistance, wear resistance, and surface quality. Each process adds cost and must be designed for from the start.</div>
+        <div class="progress-bar"></div>
+      </div>
+      <div class="qa-card" onclick="toggleQA(this)">
+        <div class="qa-question"><span class="q-num">Q1</span><span class="q-text">Explain anodizing types and their dimensional impact.</span><span class="q-toggle">+</span></div>
+        <div class="qa-answer">
+          <div class="ans-text"><strong>Anodizing</strong> converts aluminum surface to hard Al₂O₃ — grows ~50% outward, ~50% inward into base material.</div>
+          <table class="info-table"><tr><th>Type</th><th>Thickness</th><th>Use</th></tr>
+          <tr><td>Type I (Chromic)</td><td>0.5–2.5 µm</td><td>Aerospace fatigue-sensitive parts</td></tr>
+          <tr><td>Type II (Sulfuric)</td><td>5–25 µm</td><td>Decorative, general corrosion</td></tr>
+          <tr><td>Type III (Hard)</td><td>25–75 µm</td><td>Wear surfaces, hydraulic cylinders</td></tr></table>
+          <div class="alert info">💡 Add 12–15 µm per side for Type II. Sharp edges burn — use min R 0.3 mm before anodizing.</div>
+        </div>
+      </div>
+      <div class="qa-card" onclick="toggleQA(this)">
+        <div class="qa-question"><span class="q-num">Q2</span><span class="q-text">Compare Powder Coating vs Wet Paint vs Electroplating.</span><span class="q-toggle">+</span></div>
+        <div class="qa-answer">
+          <table class="info-table"><tr><th>Process</th><th>Thickness</th><th>Pros</th><th>Cons</th></tr>
+          <tr><td>Powder Coating</td><td>60–150 µm</td><td>Durable, VOC-free, cost-effective</td><td>Thick layer, hard for recesses</td></tr>
+          <tr><td>Liquid/Wet Paint</td><td>25–80 µm</td><td>Complex shapes, low setup cost</td><td>VOC emissions, less durable</td></tr>
+          <tr><td>Electroplating (Zn, Ni)</td><td>5–25 µm</td><td>Tight tolerance, excellent corrosion</td><td>H₂ embrittlement risk</td></tr></table>
+        </div>
+      </div>
+      <div class="qa-card" onclick="toggleQA(this)">
+        <div class="qa-question"><span class="q-num">Q3</span><span class="q-text">What is surface roughness Ra and Rz?</span><span class="q-toggle">+</span></div>
+        <div class="qa-answer">
+          <table class="info-table"><tr><th>Parameter</th><th>Definition</th><th>Range</th></tr>
+          <tr><td>Ra</td><td>Arithmetic mean deviation from mean line</td><td>0.025 µm (mirror) – 25 µm (rough)</td></tr>
+          <tr><td>Rz</td><td>Average height of 5 peaks + 5 valleys</td><td>Rz ≈ 4–7 × Ra</td></tr></table>
+          <div class="key-points"><div class="key-points-title">Typical Ra by Process</div><ul>
+            <li>Turning: Ra 0.8–6.3 µm | Grinding: 0.1–1.6 µm</li>
+            <li>Sand casting: Ra 6.3–25 µm | Die casting: 0.8–2 µm</li>
+            <li>Lapping/Honing: Ra 0.025–0.4 µm</li>
+          </ul></div>
+        </div>
+      </div>
+      <div class="tags"><span class="tag">Anodizing</span><span class="tag orange">Powder Coating</span><span class="tag orange">Electroplating</span><span class="tag green">Ra / Rz</span></div>
+    </div>
+
+    <!-- ══ T13: DFMEA ══ -->
+    <div id="t13" class="topic-section">
+      <div class="topic-header">
+        <div class="topic-tag">Topic 13 · Risk Analysis</div>
+        <div class="topic-title">DFMEA</div>
+        <div class="topic-desc">DFMEA systematically identifies potential design failures, assesses their risk, and implements preventive actions before product release.</div>
+        <div class="progress-bar"></div>
+      </div>
+      <div class="diagram-box">
+        <div class="diagram-title">RPN = Severity × Occurrence × Detection</div>
+        <svg width="100%" viewBox="0 0 640 130" style="max-width:640px;display:block;margin:auto">
+          <rect width="640" height="130" fill="#0a1628" rx="10"/>
+          <circle cx="140" cy="65" r="50" fill="rgba(0,212,255,0.08)" stroke="#00d4ff" stroke-width="2"/>
+          <text x="140" y="55" fill="#00d4ff" font-size="18" text-anchor="middle" font-weight="bold">S</text>
+          <text x="140" y="72" fill="#e2e8f0" font-size="12" text-anchor="middle">Severity</text>
+          <text x="140" y="86" fill="#00d4ff" font-size="13" text-anchor="middle">1–10</text>
+          <text x="140" y="100" fill="#b0bdd0" font-size="7" text-anchor="middle">Impact on customer</text>
+          <text x="210" y="70" fill="#e2e8f0" font-size="22" text-anchor="middle">×</text>
+          <circle cx="310" cy="65" r="50" fill="rgba(255,107,53,0.08)" stroke="#ff6b35" stroke-width="2"/>
+          <text x="310" y="55" fill="#ff6b35" font-size="18" text-anchor="middle" font-weight="bold">O</text>
+          <text x="310" y="72" fill="#e2e8f0" font-size="12" text-anchor="middle">Occurrence</text>
+          <text x="310" y="86" fill="#ff6b35" font-size="13" text-anchor="middle">1–10</text>
+          <text x="310" y="100" fill="#b0bdd0" font-size="7" text-anchor="middle">Likelihood</text>
+          <text x="380" y="70" fill="#e2e8f0" font-size="22" text-anchor="middle">×</text>
+          <circle cx="480" cy="65" r="50" fill="rgba(57,255,20,0.06)" stroke="#39ff14" stroke-width="2"/>
+          <text x="480" y="55" fill="#39ff14" font-size="18" text-anchor="middle" font-weight="bold">D</text>
+          <text x="480" y="72" fill="#e2e8f0" font-size="12" text-anchor="middle">Detection</text>
+          <text x="480" y="86" fill="#39ff14" font-size="13" text-anchor="middle">1–10</text>
+          <text x="480" y="100" fill="#b0bdd0" font-size="7" text-anchor="middle">Ability to detect</text>
+          <text x="570" y="58" fill="#facc15" font-size="14" text-anchor="middle" font-weight="bold">RPN</text>
+          <text x="570" y="73" fill="#facc15" font-size="13" text-anchor="middle">1–1000</text>
+          <text x="570" y="90" fill="#ff6b35" font-size="14" text-anchor="middle">≥100: Act!</text>
+          <text x="553" y="62" fill="#e2e8f0" font-size="14">=</text>
+        </svg>
+      </div>
+      <div class="qa-card" onclick="toggleQA(this)">
+        <div class="qa-question"><span class="q-num">Q1</span><span class="q-text">DFMEA vs PFMEA — what's the difference?</span><span class="q-toggle">+</span></div>
+        <div class="qa-answer">
+          <table class="info-table"><tr><th>Aspect</th><th>DFMEA</th><th>PFMEA</th></tr>
+          <tr><td>Focus</td><td>Product design failures</td><td>Manufacturing process failures</td></tr>
+          <tr><td>Owner</td><td>Design engineer</td><td>Manufacturing / process engineer</td></tr>
+          <tr><td>When</td><td>Concept/design phase</td><td>Process planning phase</td></tr>
+          <tr><td>Actions</td><td>Design changes, material changes, test additions</td><td>Process controls, poka-yoke, inspection</td></tr></table>
+        </div>
+      </div>
+      <div class="qa-card" onclick="toggleQA(this)">
+        <div class="qa-question"><span class="q-num">Q2</span><span class="q-text">Walk through the DFMEA columns step by step.</span><span class="q-toggle">+</span></div>
+        <div class="qa-answer">
+          <div class="key-points"><div class="key-points-title">DFMEA Columns (AIAG-VDA 2019)</div><ul>
+            <li><strong>1. Item / Function:</strong> Component and what it must do</li>
+            <li><strong>2. Failure Mode:</strong> How it fails (e.g., "snap arm breaks")</li>
+            <li><strong>3. Effect of Failure:</strong> What happens to customer</li>
+            <li><strong>4. Severity (S):</strong> Rate 1–10 (10 = safety risk without warning)</li>
+            <li><strong>5. Cause of Failure:</strong> Root cause</li>
+            <li><strong>6. Occurrence (O):</strong> Rate likelihood 1–10</li>
+            <li><strong>7. Prevention Controls:</strong> Design rules, analyses, simulations</li>
+            <li><strong>8. Detection (D):</strong> Rate detectability 1–10</li>
+            <li><strong>9. RPN = S × O × D</strong></li>
+            <li><strong>10. Actions + Owner + Due Date:</strong> Reduce highest RPNs</li>
+            <li><strong>11. Revised RPN:</strong> Verify improvement</li>
+          </ul></div>
+          <div class="alert warning">⚠️ Severity ≥9 must ALWAYS be addressed regardless of RPN value!</div>
+        </div>
+      </div>
+      <div class="tags"><span class="tag">RPN</span><span class="tag orange">S × O × D</span><span class="tag green">AIAG-VDA 2019</span><span class="tag">Risk Mitigation</span></div>
+    </div>
+
+    <!-- ══ T14: ECO & ECR ══ -->
+    <div id="t14" class="topic-section">
+      <div class="topic-header">
+        <div class="topic-tag">Topic 14 · Change Management</div>
+        <div class="topic-title">ECO &amp; ECR</div>
+        <div class="topic-desc">Engineering changes are formally managed through ECR (request) and ECO (order) to ensure changes are evaluated, approved, implemented, and documented systematically.</div>
+        <div class="progress-bar"></div>
+      </div>
+      <div class="qa-card" onclick="toggleQA(this)">
+        <div class="qa-question"><span class="q-num">Q1</span><span class="q-text">What is the difference between ECR and ECO?</span><span class="q-toggle">+</span></div>
+        <div class="qa-answer">
+          <table class="info-table"><tr><th>Aspect</th><th>ECR</th><th>ECO</th></tr>
+          <tr><td>Nature</td><td>Proposal/request — not yet approved</td><td>Authorized instruction — approved to implement</td></tr>
+          <tr><td>Status</td><td>Under review/evaluation</td><td>Approved and binding</td></tr>
+          <tr><td>Initiated by</td><td>Anyone (engineer, quality, supplier)</td><td>CCB / Engineering Manager</td></tr>
+          <tr><td>Contains</td><td>Problem description, proposed change</td><td>Approved change, affected drawings/BOM, effectivity, disposition</td></tr>
+          <tr><td>Analogy</td><td>Purchase requisition</td><td>Purchase order</td></tr></table>
+        </div>
+      </div>
+      <div class="qa-card" onclick="toggleQA(this)">
+        <div class="qa-question"><span class="q-num">Q2</span><span class="q-text">What are common reasons for raising an ECR?</span><span class="q-toggle">+</span></div>
+        <div class="qa-answer">
+          <div class="key-points"><div class="key-points-title">ECR Triggers</div><ul>
+            <li>Field failures / customer complaints</li>
+            <li>Cost reduction (VA/VE — Value Analysis)</li>
+            <li>Supplier change / second source qualification</li>
+            <li>Regulatory compliance update (RoHS, REACH, safety)</li>
+            <li>Manufacturing issues — difficult to make as designed</li>
+            <li>Design improvement — better geometry, weight reduction</li>
+            <li>Obsolescence — component discontinued</li>
+          </ul></div>
+        </div>
+      </div>
+      <div class="qa-card" onclick="toggleQA(this)">
+        <div class="qa-question"><span class="q-num">Q3</span><span class="q-text">What is effectivity and disposition in an ECO?</span><span class="q-toggle">+</span></div>
+        <div class="qa-answer">
+          <div class="ans-text"><strong>Effectivity</strong> = when the change becomes active in production (serial number, date, or lot). <strong>Disposition</strong> = what to do with existing inventory/WIP.</div>
+          <div class="key-points"><div class="key-points-title">Disposition Options</div><ul>
+            <li><strong>Use as-is:</strong> Existing stock acceptable — use before change</li>
+            <li><strong>Rework:</strong> Modify existing parts to new spec</li>
+            <li><strong>Return to supplier:</strong> Vendor replaces at their cost</li>
+            <li><strong>Scrap:</strong> Write off — not usable</li>
+          </ul></div>
+        </div>
+      </div>
+      <div class="tags"><span class="tag">ECR vs ECO</span><span class="tag orange">CCB Review</span><span class="tag green">Effectivity</span><span class="tag">Disposition</span><span class="tag">PLM/PDM</span></div>
+    </div>
+
+    <!-- ══ T15: DFM/DFA/DFX ══ -->
+    <div id="t15" class="topic-section">
+      <div class="topic-header">
+        <div class="topic-tag">Topic 15 · Design Methodology</div>
+        <div class="topic-title">DFM / DFA / DFX</div>
+        <div class="topic-desc">Design for X (DFX) is a family of methodologies optimizing a product for manufacturing, assembly, reliability, sustainability, and cost.</div>
+        <div class="progress-bar"></div>
+      </div>
+      <div class="qa-card" onclick="toggleQA(this)">
+        <div class="qa-question"><span class="q-num">Q1</span><span class="q-text">What is DFM? Give 5 key principles with examples.</span><span class="q-toggle">+</span></div>
+        <div class="qa-answer">
+          <div class="key-points"><div class="key-points-title">Top DFM Principles</div><ul>
+            <li><strong>1. Reduce part count:</strong> Combine parts — fewer operations, tolerance chains</li>
+            <li><strong>2. Standardize features:</strong> Standard hole sizes, threads, gauges — reduces tooling cost</li>
+            <li><strong>3. Design to process capability:</strong> Tolerances achievable by process — check Cp/Cpk</li>
+            <li><strong>4. Avoid secondary operations:</strong> Design so no deburring/reaming needed</li>
+            <li><strong>5. Near-net-shape:</strong> Minimize material removal — reduce cycle time and waste</li>
+            <li><strong>6. Accessible features:</strong> Drill depth = max 3× diameter</li>
+          </ul></div>
+        </div>
+      </div>
+      <div class="qa-card" onclick="toggleQA(this)">
+        <div class="qa-question"><span class="q-num">Q2</span><span class="q-text">What is DFA? Explain the Boothroyd-Dewhurst method.</span><span class="q-toggle">+</span></div>
+        <div class="qa-answer">
+          <div class="key-points"><div class="key-points-title">Boothroyd-Dewhurst DFA Principles</div><ul>
+            <li><strong>Minimize part count:</strong> Does it move? Different material? Needs separate service? No to all → combine</li>
+            <li><strong>Easy handling:</strong> Non-tangling, non-nesting, graspable from one direction</li>
+            <li><strong>Easy insertion:</strong> Chamfers, leads, tapers guide to position. "One-hand assembly"</li>
+            <li><strong>One-direction assembly:</strong> All parts inserted top-down</li>
+            <li><strong>Self-locating / self-fastening:</strong> Snap fits, press fits eliminate fasteners</li>
+            <li><strong>Error-proofing (Poka-yoke):</strong> Asymmetric features prevent wrong orientation</li>
+          </ul></div>
+          <div class="formula">DFA Efficiency = Theoretical min parts / Actual parts × 100%</div>
+        </div>
+      </div>
+      <div class="qa-card" onclick="toggleQA(this)">
+        <div class="qa-question"><span class="q-num">Q3</span><span class="q-text">What are other DFX methodologies?</span><span class="q-toggle">+</span></div>
+        <div class="qa-answer">
+          <table class="info-table"><tr><th>DFX</th><th>Focus</th><th>Key Activities</th></tr>
+          <tr><td>DFR (Reliability)</td><td>Field failure prevention</td><td>DFMEA, derating, HALT/HASS testing</td></tr>
+          <tr><td>DFT (Testability)</td><td>Easy testing</td><td>Test points, access, self-test features</td></tr>
+          <tr><td>DFS (Serviceability)</td><td>Easy repair</td><td>Accessible wear parts, modular design</td></tr>
+          <tr><td>DFE (Environment)</td><td>Sustainability</td><td>Material reduction, recyclability, disassembly</td></tr>
+          <tr><td>DFSS (Six Sigma)</td><td>Design quality in</td><td>DMADV, robust design, variation reduction</td></tr></table>
+        </div>
+      </div>
+      <div class="tags"><span class="tag">DFM</span><span class="tag orange">DFA</span><span class="tag orange">Boothroyd-Dewhurst</span><span class="tag green">DFR / DFS / DFE</span><span class="tag">Poka-Yoke</span></div>
+    </div>
+
+    <!-- ══ T16: ADDITIVE MFG ══ -->
+    <div id="t16" class="topic-section">
+      <div class="topic-header">
+        <div class="topic-tag">Topic 16 · Advanced Manufacturing</div>
+        <div class="topic-title">Additive Manufacturing</div>
+        <div class="topic-desc">Additive manufacturing builds parts layer by layer from digital files — enabling geometries impossible with traditional processes.</div>
+        <div class="progress-bar"></div>
+      </div>
+      <div class="qa-card" onclick="toggleQA(this)">
+        <div class="qa-question"><span class="q-num">Q1</span><span class="q-text">Compare FDM, SLA, SLS, and DMLS processes.</span><span class="q-toggle">+</span></div>
+        <div class="qa-answer">
+          <table class="info-table"><tr><th>Process</th><th>Feedstock</th><th>Accuracy</th><th>Best For</th></tr>
+          <tr><td>FDM/FFF</td><td>Thermoplastic filament</td><td>±0.3–0.5 mm</td><td>Concept models, low cost</td></tr>
+          <tr><td>SLA/DLP</td><td>Photopolymer resin</td><td>±0.1–0.2 mm</td><td>High detail, dental, jewelry</td></tr>
+          <tr><td>SLS (Polymer)</td><td>Nylon powder</td><td>±0.2–0.3 mm</td><td>Functional parts, no supports</td></tr>
+          <tr><td>DMLS/SLM</td><td>Metal powder</td><td>±0.05–0.1 mm</td><td>Aerospace, medical metal parts</td></tr>
+          <tr><td>MJF</td><td>Powder + inkjet agents</td><td>±0.2–0.3 mm</td><td>Production, medium volume PA12</td></tr></table>
+        </div>
+      </div>
+      <div class="qa-card" onclick="toggleQA(this)">
+        <div class="qa-question"><span class="q-num">Q2</span><span class="q-text">What are AM-specific design rules (DfAM)?</span><span class="q-toggle">+</span></div>
+        <div class="qa-answer">
+          <div class="key-points"><div class="key-points-title">Key DfAM Rules</div><ul>
+            <li><strong>Overhang rule:</strong> Features >45° from vertical need supports. Design self-supporting 45° angles</li>
+            <li><strong>Min wall thickness:</strong> FDM: 1.5 mm | SLA: 0.5 mm | DMLS: 0.3 mm</li>
+            <li><strong>Holes:</strong> Horizontal holes print oval → drill after. Vertical holes = round</li>
+            <li><strong>Print orientation:</strong> Z direction = weakest — orient load path perpendicular to layers</li>
+            <li><strong>Topology optimization:</strong> Hollow out parts, lattice structures for lightweighting</li>
+            <li><strong>Part consolidation:</strong> Merge multi-part assemblies into one print</li>
+          </ul></div>
+        </div>
+      </div>
+      <div class="qa-card" onclick="toggleQA(this)">
+        <div class="qa-question"><span class="q-num">Q3</span><span class="q-text">When to choose AM vs traditional manufacturing?</span><span class="q-toggle">+</span></div>
+        <div class="qa-answer">
+          <table class="info-table"><tr><th>Prefer AM When</th><th>Prefer Traditional When</th></tr>
+          <tr><td>Prototyping / 1–100 parts</td><td>High volume (>10,000 parts)</td></tr>
+          <tr><td>Highly complex geometry</td><td>Tight tolerances (±0.01 mm)</td></tr>
+          <tr><td>Part consolidation opportunity</td><td>Surface finish critical (Ra &lt; 0.8 µm)</td></tr>
+          <tr><td>Custom per unit (medical, hearing aids)</td><td>High-strength isotropic material needed</td></tr>
+          <tr><td>No tooling budget</td><td>Cost/part critical at volume</td></tr></table>
+        </div>
+      </div>
+      <div class="tags"><span class="tag">FDM / SLA / SLS</span><span class="tag orange">DMLS / SLM</span><span class="tag green">Support Structures</span><span class="tag">Topology Optimization</span><span class="tag">DfAM</span></div>
+    </div>
+
+    <!-- ══ T17: FEA BASICS ══ -->
+    <div id="t17" class="topic-section">
+      <div class="topic-header">
+        <div class="topic-tag">Topic 17 · Simulation & Analysis</div>
+        <div class="topic-title">FEA Basics</div>
+        <div class="topic-desc">FEA divides a complex structure into small finite elements to predict stress, strain, displacement, thermal, and vibration behavior under applied loads.</div>
+        <div class="progress-bar"></div>
+      </div>
+      <div class="qa-card" onclick="toggleQA(this)">
+        <div class="qa-question"><span class="q-num">Q1</span><span class="q-text">What is FEA and what fundamental equation does it solve?</span><span class="q-toggle">+</span></div>
+        <div class="qa-answer">
+          <div class="ans-text"><strong>FEA</strong> divides a structure into a mesh of small elements. Within each element, displacement is approximated by polynomial functions, then assembled into a global system.</div>
+          <div class="formula">[K] {u} = {F}
+[K] = Stiffness Matrix | {u} = Nodal Displacements | {F} = Forces</div>
+          <div class="key-points"><div class="key-points-title">Key Concepts</div><ul>
+            <li><strong>Node:</strong> Connection point with degrees of freedom (DOF)</li>
+            <li><strong>Element:</strong> Small finite piece — tetra, hexa, shell, beam</li>
+            <li>Solving: {u} = [K]⁻¹{F} → displacements → strains → stresses</li>
+          </ul></div>
+        </div>
+      </div>
+      <div class="qa-card" onclick="toggleQA(this)">
+        <div class="qa-question"><span class="q-num">Q2</span><span class="q-text">What are element types and how do you choose?</span><span class="q-toggle">+</span></div>
+        <div class="qa-answer">
+          <table class="info-table"><tr><th>Element</th><th>Shape</th><th>Used For</th></tr>
+          <tr><td>Tetrahedral (Tet4, Tet10)</td><td>4 or 10-node tetrahedron</td><td>Complex 3D solids — auto-meshable</td></tr>
+          <tr><td>Hexahedral (Hex8, Hex20)</td><td>8–20 node brick</td><td>Regular geometry — more accurate</td></tr>
+          <tr><td>Shell (Quad4, Tri3)</td><td>2D surface + thickness</td><td>Thin structures — sheet metal, plastic shells</td></tr>
+          <tr><td>Beam (1D)</td><td>Line + cross-section</td><td>Structural frames, beams, trusses</td></tr></table>
+          <div class="alert tip">✅ Mesh convergence: Refine until stress changes &lt;5% between refinements = converged mesh.</div>
+        </div>
+      </div>
+      <div class="qa-card" onclick="toggleQA(this)">
+        <div class="qa-question"><span class="q-num">Q3</span><span class="q-text">What is von Mises stress and Factor of Safety (FoS)?</span><span class="q-toggle">+</span></div>
+        <div class="qa-answer">
+          <div class="ans-text"><strong>von Mises stress</strong> combines all stress components into one scalar value for comparison with yield strength (best for ductile metals).</div>
+          <div class="formula">σ_vM = √[½((σ₁-σ₂)² + (σ₂-σ₃)² + (σ₃-σ₁)²)]
+FoS = σ_yield / σ_max_vonMises</div>
+          <div class="key-points"><div class="key-points-title">FoS Guidelines</div><ul>
+            <li>Well-known loads, no impact: FoS = 1.25–1.5</li>
+            <li>Average design, moderate uncertainty: FoS = 2.0</li>
+            <li>Impact loads, human safety: FoS = 3.0–5.0</li>
+            <li>Fatigue: Use endurance limit vs alternating stress separately</li>
+          </ul></div>
+        </div>
+      </div>
+      <div class="qa-card" onclick="toggleQA(this)">
+        <div class="qa-question"><span class="q-num">Q4</span><span class="q-text">What are the different types of FEA analyses?</span><span class="q-toggle">+</span></div>
+        <div class="qa-answer">
+          <table class="info-table"><tr><th>Analysis Type</th><th>Purpose</th><th>Output</th></tr>
+          <tr><td>Linear Static</td><td>Stress under constant load</td><td>Stress, displacement, FoS</td></tr>
+          <tr><td>Nonlinear Static</td><td>Large deformation, plasticity, contact</td><td>Post-yield stress, contact pressure</td></tr>
+          <tr><td>Modal Analysis</td><td>Natural frequencies & mode shapes</td><td>fn (Hz), mode shapes</td></tr>
+          <tr><td>Harmonic</td><td>Response to sinusoidal loading</td><td>Amplitude vs frequency</td></tr>
+          <tr><td>Transient/Dynamic</td><td>Time-varying loads, impact</td><td>Response vs time</td></tr>
+          <tr><td>Thermal</td><td>Temperature distribution</td><td>Temp field, heat flux</td></tr>
+          <tr><td>Fatigue</td><td>Life under cyclic loading</td><td>Cycles to failure, damage</td></tr></table>
+        </div>
+      </div>
+      <div class="tags"><span class="tag">von Mises</span><span class="tag orange">Meshing</span><span class="tag orange">FoS</span><span class="tag green">Modal Analysis</span><span class="tag">[K]{u}={F}</span></div>
+    </div>
+
+  </div><!-- end main -->
+</div><!-- end body-wrapper -->
+
+<script>
+  // ── Sidebar toggle ──
+  function toggleSidebar() {
+    const sb = document.getElementById('sidebar');
+    const ham = document.getElementById('hamburger');
+    const overlay = document.getElementById('overlay');
+    const isOpen = sb.classList.contains('open');
+    if (isOpen) {
+      sb.classList.remove('open');
+      ham.classList.remove('open');
+      overlay.classList.remove('visible');
+    } else {
+      sb.classList.add('open');
+      ham.classList.add('open');
+      overlay.classList.add('visible');
+    }
+  }
+
+  function closeSidebar() {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('hamburger').classList.remove('open');
+    document.getElementById('overlay').classList.remove('visible');
+  }
+
+  // ── Topic switch ──
+  function showTopic(id, label) {
+    // Hide all sections
+    document.querySelectorAll('.topic-section').forEach(s => s.classList.remove('active'));
+    // Show selected
+    const section = document.getElementById(id);
+    if (section) section.classList.add('active');
+    // Update nav active state
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    event.currentTarget.classList.add('active');
+    // Update pill label
+    document.getElementById('currentPill').textContent = label;
+    // Scroll content to top
+    document.getElementById('mainContent').scrollTop = 0;
+    // Close sidebar on mobile
+    closeSidebar();
+  }
+
+  // ── Q&A toggle ──
+  function toggleQA(card) {
+    card.classList.toggle('open');
+  }
+
+  // ── Search filter ──
+  function filterNav(val) {
+    const v = val.toLowerCase().trim();
+    document.querySelectorAll('#navList .nav-item').forEach(item => {
+      const name = item.getAttribute('data-name') || '';
+      const label = item.querySelector('.nav-label').textContent.toLowerCase();
+      item.style.display = (name.includes(v) || label.includes(v)) ? '' : 'none';
+    });
+  }
+
+  // ── Open first Q on load ──
+  window.addEventListener('DOMContentLoaded', () => {
+    const firstCard = document.querySelector('#t1 .qa-card');
+    if (firstCard) firstCard.classList.add('open');
+  });
+</script>
+</body>
+</html>
